@@ -21,9 +21,10 @@ try {
         log::add('geckospa', 'debug', 'Message receive for evenItem -> ' . json_encode($result['eventItem']));
         geckospa::updateItems($result['eventItem']);
     } elseif (isset($result['devicesList'])) {
-        log::add('geckospa', 'debug', 'Message receive for devicesList -> ' . json_encode($result['devicesList']));
-        log::add('geckospa', 'debug', 'Message receive for devicesList -> ' . str_replace(array('\\',''), array(''),json_encode($result['devicesList'])));
-        geckospa::create_or_update_devices(str_replace(array('\\',''), array(''),json_encode($result['devicesList'])));
+        $jsonMefListDevices=str_replace(array('\\',''), array(''),json_encode($result['devicesList']));
+
+        log::add('geckospa', 'debug', 'Message receive for devicesList -> ' . $jsonMefListDevices);        
+        geckospa::create_or_update_devices($jsonMefListDevices);
    //}else {
     //    log::add('geckospa', 'error', 'unknown message received from daemon'); //remplacez template par l'id de votre plugin
     }
