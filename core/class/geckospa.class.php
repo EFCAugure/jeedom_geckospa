@@ -60,15 +60,15 @@ public static function deamon_start() {
       throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
   }
 
-  $path = realpath(dirname(__FILE__) . '/../../resources/geckospad'); 
-  $cmd = 'python3 ' . $path . '/geckospad.py'; // nom du démon
+  $path = realpath(dirname(__FILE__) . '/../../resources/geckospadpid'); 
+  $cmd = 'python3 ' . $path . '/geckospadpid.py'; // nom du démon
   $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
   $cmd .= ' --socketport ' . config::byKey('socketport', __CLASS__, '55009'); // port du daemon
   $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/geckospa/core/php/jeegeckospa.php'; // chemin de la callback url 
   //$cmd .= ' --user "' . trim(str_replace('"', '\"', config::byKey('user', __CLASS__))) . '"'; // user compte somfy
   //$cmd .= ' --pswd "' . trim(str_replace('"', '\"', config::byKey('password', __CLASS__))) . '"'; // et password compte Somfy
   $cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__); // l'apikey pour authentifier les échanges suivants
-  $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/geckospad.pid'; // et on précise le chemin vers le pid file (ne pas modifier)
+  $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/geckospadpi.pid'; // et on précise le chemin vers le pid file (ne pas modifier)
   //$cmd .= ' --pincode "' . trim(str_replace('"', '\"', config::byKey('pincode', __CLASS__))) . '"'; // Pin code box Somfy
   //$cmd .= ' --boxLocalIp "' . trim(str_replace('"', '\"', config::byKey('boxLocalIp', __CLASS__))) . '"'; // IP box somfy
   $cmd .= ' --clientId "' . trim(str_replace('"', '\"', self::guidv4())) . '"'; // IP box somfy
