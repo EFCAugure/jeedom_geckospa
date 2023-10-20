@@ -514,7 +514,7 @@ if args.cycle:
 if args.socketport:
 	_socket_port = args.socketport
 if args.clientId:
-	_client_id = args.clientId
+	_client_id = args._client_id
 
 _socket_port = int(_socket_port)
 
