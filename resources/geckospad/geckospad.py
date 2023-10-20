@@ -62,7 +62,7 @@ def listen():
 	jeedom_socket.open()
 
 	locator = GeckoLocator(_client_id)
-	spaDiscover(locator)
+	locator = spaDiscover(locator)
 	
 	"""
 	httpLog()
@@ -84,8 +84,10 @@ def listen():
 
 	try:
 		while 1:
-			time.sleep(0.5)
+			#time.sleep(0.5)
+			time.sleep(5)
 			read_socket()
+			fetchStatesForallSpa(locator)
 			#fetchListener()
 
 	except KeyboardInterrupt:
@@ -109,6 +111,114 @@ def spaDiscover(locator):
 		shutdown()
 
 	logging.debug("Number of spas discover : %i", int(len(locator.spas)))
+	return locator
+
+def fetchStatesForallSpa(locator):
+	logging.debug("Get all states for each spa")
+	response={}
+	response['spas']=[]
+
+	for i in range(len(locator.spas)):
+		spa={}
+		spa['name']=locator.spas[i].name
+		spa['id']=locator.spas[i].identifier_as_string
+		#spa['cmds']=[]
+		#spa['cmds'].append(state({locator.spas[i].identifier_as_string}))
+		spa['cmds']=state({locator.spas[i].identifier_as_string})
+		response['spas'].append(spa)
+
+	logging.debug("List of spa and states : %s", json.dumps(response))
+
+def state(spaIdentifier):
+	logging.debug("Get states for spa identifier : %s", spaIdentifier)
+
+	facade = GeckoLocator.find_spa(_client_id, spaIdentifier).get_facade(False)
+
+	logging.debug("	- Connectiong to : %s", facade.name)
+	#print(f"	* Connecting to {facade.name} ", end="", flush=True)
+	while not facade.is_connected:
+		# Could also be `await asyncio.sleep(1)`
+		facade.wait(1)
+		print(".", end="", flush=True)
+	#spa={}
+	#spa['name']=facade.name
+	#spa['id']=facade.identifier
+	#spa['cmds']=[]
+	cmds=[]
+
+	logging.debug("		-> Connected")
+
+	#print(f"		- Watercare mode : {facade.water_care.mode} ;list: {facade.water_care.modes}")
+	cmdWaterCare={}
+	cmdWaterCare['name'] = 'water_care'
+	cmdWaterCare['state'] = facade.water_care.mode
+	cmdWaterCare['stateString'] = facade.water_care.monitor
+	cmdWaterCare['stateList'] = facade.water_care.modes
+	#cmdWaterCare['on_watercar'] = facade.water_care.on_watercar
+	#cmdWaterCare['stateString']=GeckoConstants.WATERCARE_MODE_STRING.index({cmdWaterCare['state']})
+	cmds.append(cmdWaterCare)
+    
+
+	#print(f"		- Lights mode : {len(facade.lights)} |{facade.lights[0].is_on}")
+	for i in range(len(facade.lights)):
+		cmdLights = {}
+		cmdLights['name'] = "lights_" + str(i)
+		cmdLights['state'] = facade.lights[i].is_on
+		cmdLights['stateList'] = ['ON', 'OFF']
+		cmds.append(cmdLights)
+
+	#print(f"		- Heater : {facade.water_heater.min_temp} | {facade.water_heater.max_temp} | {facade.water_heater.current_temperature} | {facade.water_heater.temperature_unit} ")
+	cmdHeater={}
+	cmdHeater['name'] = 'water_heater'
+	cmdHeater['min_temp'] = facade.water_heater.min_temp
+	cmdHeater['max_temp'] = facade.water_heater.max_temp
+	cmdHeater['current_temp'] = facade.water_heater.current_temperature
+	cmdHeater['current_operation'] = facade.water_heater.current_operation
+	cmdHeater['target_temperature'] = facade.water_heater.target_temperature    
+	cmdHeater['unit'] = facade.water_heater.temperature_unit
+	cmds.append(cmdHeater)
+    
+    
+	#print(f"		- Pump : {len(facade.pumps)} | {facade.pumps[0].is_on} | {facade.pumps[0].mode} | {facade.pumps[0].modes} ")
+	for i in range(len(facade.pumps)):
+		cmdPumps={}
+		cmdPumps['name'] = "pumps_" + str(i)
+		cmdPumps['state'] = facade.pumps[i].is_on
+		cmdPumps['mode'] = facade.pumps[i].mode
+		cmdPumps['stateList'] = facade.pumps[i].modes
+		cmds.append(cmdPumps)
+
+	for i in range(len(facade.blowers)):
+		cmdBlowers = {}
+		cmdBlowers['name'] = "blower_" + str(i)
+		cmdBlowers['state'] = facade.blowers[i].is_on
+		cmds.append(cmdBlowers)
+
+	for i in range(len(facade.reminders)):
+		print(f"aa {facade.reminders[i].type}")
+
+	for i in range(len(facade.sensors)):
+		cmdSensors = {}
+		cmdSensors['name'] = "sensor_" + str(i)
+		cmdSensors['label'] = facade.sensors[i].accessor.tag        
+		cmdSensors['state'] = facade.sensors[i].state
+		cmdSensors['unit'] = facade.sensors[i].unit_of_measurement
+		cmds.append(cmdSensors)
+		#print(cmdSensors)
+
+		del cmdSensors
+	for i in range(len(facade.binary_sensors)):
+		cmdSensors = {}
+		cmdSensors['name'] = "sensor_binary_" + str(i)
+		cmdSensors['label'] = facade.binary_sensors[i].accessor.tag
+		cmdSensors['state'] = facade.binary_sensors[i].state
+		cmdSensors['unit'] = facade.binary_sensors[i].unit_of_measurement
+		cmds.append(cmdSensors)        
+
+		del cmdSensors
+
+	facade.complete()
+	return cmds	
 
 def handler(signum=None, frame=None):
 	logging.debug("Signal %i caught, exiting...", int(signum))
