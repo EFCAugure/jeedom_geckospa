@@ -61,8 +61,8 @@ def listen():
 	logging.debug('Listen socket jeedom for client id' + _client_id)
 	jeedom_socket.open()
 
-	_locator = GeckoLocator(_client_id)
-	spaDiscover()
+	locator = GeckoLocator(_client_id)
+	spaDiscover(locator)
 	
 	"""
 	httpLog()
@@ -92,9 +92,9 @@ def listen():
 		shutdown()
 
 
-def spaDiscover():
+def spaDiscover(locator):
 	logging.debug("Discovering spa ...")
-	_locator.start_discovery()
+	locator.start_discovery()
 
 	# We can perform other operations while this is progressing, like output a dot
 	while not locator.has_had_enough_time:
@@ -102,7 +102,7 @@ def spaDiscover():
 		locator.wait(1)		
 		print(".", end="", flush=True)
 	
-	_locator.complete()
+	locator.complete()
 
 	if len(locator.spas) == 0:
 		logging.error("Cannot continue as there were no spas detected")
