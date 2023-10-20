@@ -128,6 +128,7 @@ def fetchStatesForallSpa(locator):
 		response['spas'].append(spa)
 
 	logging.debug("List of spa and states : %s", json.dumps(response))
+	jeedom_com.send_change_immediate({'devicesList' : json.dumps(response)})
 
 def state(spaIdentifier):
 	logging.debug("Get states for spa identifier : %s", spaIdentifier)

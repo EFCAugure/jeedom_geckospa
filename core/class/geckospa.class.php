@@ -161,8 +161,9 @@ public static function sendToDaemon($params) {
     log::add(__CLASS__, 'debug', 'create_or_update_devices');
     
     $eqLogics=eqLogic::byType(__CLASS__);
-    foreach ($devices as $device) {
-        log::add(__CLASS__, 'debug', '  - device : ' . $device['deviceURL']);
+    foreach ($devices['spas'] as $device) {
+        log::add(__CLASS__, 'debug', '  - spa : ' . json_encode($device));
+        /*
          $found = false;
 
          foreach ($eqLogics as $eqLogic) {
@@ -187,7 +188,7 @@ public static function sendToDaemon($params) {
 
              $eqLogic = self::byId($eqLogic->getId());
 
-             /***********************************/
+
              //Actions
              
              if ($device['uiClass'] == "HitachiHeatingSystem") {
@@ -471,7 +472,7 @@ public static function sendToDaemon($params) {
              $tahomaLocalPiCmd->setConfiguration('commandName', "cancelExecutions");
              $tahomaLocalPiCmd->setConfiguration('nparams', 1);
              $tahomaLocalPiCmd->save();			 
-             /***********************************/
+
 			 
 			 
              //Infos
@@ -617,6 +618,7 @@ public static function sendToDaemon($params) {
                  }
              }
          }
+         */
      }
 
   }
