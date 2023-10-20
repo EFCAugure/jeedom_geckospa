@@ -158,7 +158,7 @@ public static function sendToDaemon($params) {
   /*     * *************************Attributs****************************** */
 
   public static function create_or_update_devices($devices) {
-    log::add(__CLASS__, 'debug', 'create_or_update_devices');
+    log::add(__CLASS__, 'debug', 'create_or_update_devices -> '. json_encode($devices));
     
     $eqLogics=eqLogic::byType(__CLASS__);
     foreach ($devices['spas'] as $device) {
