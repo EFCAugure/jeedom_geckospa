@@ -164,7 +164,7 @@ public static function sendToDaemon($params) {
     foreach ($aSpas['spas'] as $spa) {
         log::add(__CLASS__, 'debug', '  - spa : ' . json_encode($spa));
         $found = false;
-        $eqLogic=eqLogic::byObjectId($spa['id']);
+        $eqLogic=eqLogic::byLogicalId($spa['id']);
         if (is_object($eqLogic)) {
             $found=true;
         }
