@@ -124,8 +124,8 @@ protected static function getSocketPort() {
 }
 
 public function getImage() {
-    $typeMef=str_replace(array('internal:','io:'),array(''),$this->getConfiguration('type'));
-    $path='/var/www/html/plugins/geckospa/data/img/custom/' . $typeMef . '.png';
+    //$typeMef=str_replace(array('internal:','io:'),array(''),$this->getConfiguration('type'));
+    //$path='/var/www/html/plugins/geckospa/data/img/custom/' . $typeMef . '.png';
 
     if (!(file_exists($path))) {
         $path = '/var/www/html/plugins/geckospa/data/img/' . $typeMef . '.png';
@@ -136,7 +136,8 @@ public function getImage() {
 
     
     log::add(__CLASS__, 'debug', 'getImage '. $this->getConfiguration('type') . ' -> ' . $path);
-  	return str_replace(array('/var/www/html/'),array(''),$path);
+    return '/var/www/html/plugins/geckospa/data/img/gecko_equipment.png';
+  	//return str_replace(array('/var/www/html/'),array(''),$path);
 }
 
 /* Send data to daemon */
@@ -181,6 +182,11 @@ public static function sendToDaemon($params) {
              $eqLogic->save();
 
              $eqLogic = self::byId($eqLogic->getId());
+        } else {
+            log::add(__CLASS__, 'debug', '      -> spa exist -> check if all cmds are created');
+            foreach($spa['cmds'] as $cmds) {
+                log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmds['name'] . ' -> ' . $cmds['state']);
+            }
         }
         /*
         foreach ($eqLogics as $eqLogic) {
