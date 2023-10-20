@@ -518,7 +518,7 @@ if args.cycle:
 if args.socketport:
 	_socket_port = args.socketport
 if args.clientId:
-	_client_id = args._client_id
+	_client_id = args.clientId
 
 _socket_port = int(_socket_port)
 
@@ -532,7 +532,7 @@ logging.info('Socket host: %s', _socket_host)
 logging.info('PID file: %s', _pidfile)
 logging.info('Apikey: %s', _apikey)
 logging.info('Device: %s', _device)
-logging.info('Client Id : %s', clientId)
+logging.info('Client Id : %s', _client_id)
 logging.info('*-------------------------------------------------------------------------*')
 
 signal.signal(signal.SIGINT, handler)
