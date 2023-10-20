@@ -136,7 +136,7 @@ public function getImage() {
 
     
     log::add(__CLASS__, 'debug', 'getImage '. $this->getConfiguration('type') . ' -> ' . $path);
-    return '/var/www/html/plugins/geckospa/data/img/gecko_equipment.png';
+    return 'plugins/geckospa/data/img//gecko_equipment.png';
   	//return str_replace(array('/var/www/html/'),array(''),$path);
 }
 
@@ -164,10 +164,14 @@ public static function sendToDaemon($params) {
     $eqLogics=eqLogic::byType(__CLASS__);
     foreach ($aSpas['spas'] as $spa) {
         log::add(__CLASS__, 'debug', '  - spa : ' . json_encode($spa));
+
         $found = false;
-        $eqLogic=eqLogic::byLogicalId($spa['id']);
-        if (is_object($eqLogic)) {
-            $found=true;
+        foreach ($eqLogics as $eqLogic) {
+            if ($spa['id'] == $eqLogic->getLogicalId()) {
+                $eqLogic_found = $eqLogic;
+                $found = true;
+                break;
+            }
         }
 
         if (!$found) {
@@ -182,12 +186,21 @@ public static function sendToDaemon($params) {
              $eqLogic->save();
 
              $eqLogic = self::byId($eqLogic->getId());
+
         } else {
-            log::add(__CLASS__, 'debug', '      -> spa exist -> check if all cmds are created');
-            foreach($spa['cmds'] as $cmds) {
-                log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmds['name'] . ' -> ' . $cmds['state']);
+            $eqLogic=$eqLogic_found;
+            
+        }
+
+        foreach($spa['cmds'] as $cmds) {
+            log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmds['name'] . ' -> ' . $cmds['state']);
+            $geckoSpaCmd = $this->getCmd(null, $cmds['name']);
+            if (!is_object($alarme_IMACmd)) {
+                log::add(__CLASS__, 'debug', '          * Create cmd name : ' . $cmds['name'] . ' -> ' . $cmds['state']);
+                //$geckoSpaCmd = new geckospaCmd();
             }
         }
+
         /*
         foreach ($eqLogics as $eqLogic) {
             if ($spa['id'] == $eqLogic->getConfiguration('deviceURL')) {
