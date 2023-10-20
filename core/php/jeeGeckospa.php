@@ -22,7 +22,8 @@ try {
         geckospa::updateItems($result['eventItem']);
     } elseif (isset($result['devicesList'])) {
         log::add('geckospa', 'debug', 'Message receive for devicesList -> ' . json_encode($result['devicesList']));
-        geckospa::create_or_update_devices($result['devicesList']);
+        log::add('geckospa', 'debug', 'Message receive for devicesList -> ' . str_replace(array('\\',''), array(''),json_encode($result['devicesList'])));
+        geckospa::create_or_update_devices(str_replace(array('\\',''), array(''),json_encode($result['devicesList'])));
    //}else {
     //    log::add('geckospa', 'error', 'unknown message received from daemon'); //remplacez template par l'id de votre plugin
     }
