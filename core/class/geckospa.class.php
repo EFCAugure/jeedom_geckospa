@@ -159,10 +159,11 @@ public static function sendToDaemon($params) {
 
   public static function create_or_update_devices($devices) {
     log::add(__CLASS__, 'debug', 'create_or_update_devices -> '. $devices);
-    
+    $aDevices=json_decode($devices,true);
     $eqLogics=eqLogic::byType(__CLASS__);
-    foreach ($devices['spas'] as $device) {
+    foreach ($aDevices as $device) {
         log::add(__CLASS__, 'debug', '  - spa : ' . json_encode($device));
+        
         /*
          $found = false;
 
