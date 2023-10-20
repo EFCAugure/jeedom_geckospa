@@ -111,17 +111,6 @@ def spaDiscover():
 def handler(signum=None, frame=None):
 	logging.debug("Signal %i caught, exiting...", int(signum))
 	shutdown()
-	
-"""
-def httpLog():
-	logging.getLogger("requests").setLevel(logging.ERROR)
-	logging.getLogger("urllib3").setLevel(logging.ERROR)
-	requests.packages.urllib3.disable_warnings()
-	
-
-# ----------------------------------------------------------------------------
-
-
 
 def shutdown():
 	logging.debug("Shutdown")
@@ -146,6 +135,19 @@ def shutdown():
 	logging.debug("Exit 0")
 	sys.stdout.flush()
 	os._exit(0)
+
+"""
+def httpLog():
+	logging.getLogger("requests").setLevel(logging.ERROR)
+	logging.getLogger("urllib3").setLevel(logging.ERROR)
+	requests.packages.urllib3.disable_warnings()
+	
+
+# ----------------------------------------------------------------------------
+
+
+
+
 
 def loginTahoma():
 	logging.debug(' * logging tahoma')
