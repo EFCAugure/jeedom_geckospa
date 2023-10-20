@@ -58,10 +58,10 @@ def read_socket():
 			logging.error('Send command to demon error: %s' ,e)
 
 def listen():
-	logging.debug('Listen socket jeedom')
+	logging.debug('Listen socket jeedom for client id' + _client_id)
 	jeedom_socket.open()
 
-	_locator = GeckoLocator(CLIENT_ID)
+	_locator = GeckoLocator(_client_id)
 	
 	"""
 	httpLog()
