@@ -108,6 +108,10 @@ def spaDiscover():
 
 	logging.debug("Number of spas discover : %i", int(len(locator.spas)))
 
+def handler(signum=None, frame=None):
+	logging.debug("Signal %i caught, exiting...", int(signum))
+	shutdown()
+	
 """
 def httpLog():
 	logging.getLogger("requests").setLevel(logging.ERROR)
@@ -117,9 +121,7 @@ def httpLog():
 
 # ----------------------------------------------------------------------------
 
-def handler(signum=None, frame=None):
-	logging.debug("Signal %i caught, exiting...", int(signum))
-	shutdown()
+
 
 def shutdown():
 	logging.debug("Shutdown")
