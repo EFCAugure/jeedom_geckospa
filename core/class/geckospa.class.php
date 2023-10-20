@@ -64,7 +64,7 @@ public static function deamon_start() {
   $cmd = 'python3 ' . $path . '/geckospad.py'; // nom du démon
   $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
   $cmd .= ' --socketport ' . config::byKey('socketport', __CLASS__, '55009'); // port du daemon
-  $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/geckospa/core/php/jeegeckospa.php'; // chemin de la callback url 
+  $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/geckospa/core/php/jeeGeckospa.php'; // chemin de la callback url 
   //$cmd .= ' --user "' . trim(str_replace('"', '\"', config::byKey('user', __CLASS__))) . '"'; // user compte somfy
   //$cmd .= ' --pswd "' . trim(str_replace('"', '\"', config::byKey('password', __CLASS__))) . '"'; // et password compte Somfy
   $cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__); // l'apikey pour authentifier les échanges suivants
