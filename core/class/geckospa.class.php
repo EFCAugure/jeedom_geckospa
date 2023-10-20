@@ -157,24 +157,43 @@ public static function sendToDaemon($params) {
 
   /*     * *************************Attributs****************************** */
 
-  public static function create_or_update_devices($devices) {
-    log::add(__CLASS__, 'debug', 'create_or_update_devices -> '. $devices);
-    $aDevices=json_decode($devices,true);
+  public static function create_or_update_devices($spas) {
+    log::add(__CLASS__, 'debug', 'create_or_update_devices -> '. $spas);
+    $aSpas=json_decode($spas,true);
     $eqLogics=eqLogic::byType(__CLASS__);
-    foreach ($aDevices['spas'] as $device) {
-        log::add(__CLASS__, 'debug', '  - spa : ' . json_encode($device));
-        
-        /*
-         $found = false;
+    foreach ($aSpas['spas'] as $spa) {
+        log::add(__CLASS__, 'debug', '  - spa : ' . json_encode($spa));
+        $found = false;
+        $eqLogic=eqLogic::byObjectId($spa['id']);
+        if (is_object($eqLogic)) {
+            $found=true;
+        }
 
-         foreach ($eqLogics as $eqLogic) {
-             if ($device['deviceURL'] == $eqLogic->getConfiguration('deviceURL')) {
-                log::add(__CLASS__, 'debug', '      -> device already exist');
-                 $eqLogic_found = $eqLogic;
-                 $found = true;
-                 break;
-             }
-         }
+        if (!$found) {
+            log::add(__CLASS__, 'debug', '      -> spa not exist -> auto create it');
+             $eqLogic = new eqLogic();
+             $eqLogic->setEqType_name(__CLASS__);
+             $eqLogic->setIsEnable(1);
+             $eqLogic->setIsVisible(1);
+             $eqLogic->setName($spa['name']);
+             $eqLogic->setConfiguration('id', $spa['id']);
+             $eqLogic->setLogicalId($spa['id']);
+             $eqLogic->save();
+
+             $eqLogic = self::byId($eqLogic->getId());
+        }
+        /*
+        foreach ($eqLogics as $eqLogic) {
+            if ($spa['id'] == $eqLogic->getConfiguration('deviceURL')) {
+               log::add(__CLASS__, 'debug', '      -> device already exist');
+                $eqLogic_found = $eqLogic;
+                $found = true;
+                break;
+            }
+        } 
+        */       
+        /*
+
 
          if (!$found) {
             log::add(__CLASS__, 'debug', '      -> device not exist -> auto create it');
