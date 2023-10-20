@@ -103,7 +103,7 @@ def spaDiscover():
 	_locator.complete()
 
 	if len(locator.spas) == 0:
-		logging.error(Cannot continue as there were no spas detected")
+		logging.error("Cannot continue as there were no spas detected")
 		shutdown()
 
 	logging.debug("Number of spas discover : %i", int(len(locator.spas)))
