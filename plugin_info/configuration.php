@@ -23,41 +23,7 @@ if (!isConnect()) {
 }
 ?>
 <form class="form-horizontal">
-  <fieldset>
-  	<legend><i class="fas fa-list-alt"></i> {{Configuration connexion compte Somfy}}</legend>
-    <div class="form-group">
-      <label class="col-md-4 control-label">{{Nom utilisateur compte Somfy}}
-        <sup><i class="fas fa-question-circle tooltips" title="{{Nom utilisateur Somfy}}"></i></sup>
-      </label>
-      <div class="col-md-4">
-        <input class="configKey form-control" data-l1key="user"/>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-md-4 control-label">{{Mot de passe compte Somfy}}
-        <sup><i class="fas fa-question-circle tooltips" title="{{Utilisateur Somfy }}"></i></sup>
-      </label>
-      <div class="col-md-4">
-        <input type="password" class="configKey form-control" data-l1key="password"/>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-md-4 control-label">{{Code pin box Somfy}}
-        <sup><i class="fas fa-question-circle tooltips" title="{{Code pin box Somfy accessible depuis le compte client }}"></i></sup>
-      </label>
-      <div class="col-md-4">
-        <input class="configKey form-control" data-l1key="pincode"/>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="col-md-4 control-label">{{Adresse IP local de la box Somfy}}
-        <sup><i class="fas fa-question-circle tooltips" title="{{Adresse IP locale de la box Somfy}}"></i></sup>
-      </label>
-      <div class="col-md-4">
-        <input class="configKey form-control" data-l1key="boxLocalIp"/>
-      </div>
-    </div> 
-          
+  <fieldset>      
    	<legend><i class="fas fa-list-alt"></i> {{Configuration daemon}}</legend>
     <div class="form-group">
       <label class="col-md-4 control-label">{{Port du daemon}}
