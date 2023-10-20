@@ -62,6 +62,7 @@ def listen():
 	jeedom_socket.open()
 
 	_locator = GeckoLocator(_client_id)
+	spaDiscover()
 	
 	"""
 	httpLog()
@@ -92,6 +93,7 @@ def listen():
 
 
 def spaDiscover():
+	logging.debug("Discovering spa ...")
 	_locator.start_discovery()
 
 	# We can perform other operations while this is progressing, like output a dot
