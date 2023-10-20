@@ -485,7 +485,7 @@ _callback = ''
 _cycle = 0.3
 
 _client_id=''
-_locator
+_locator=''
 
 parser = argparse.ArgumentParser(
 description='Desmond Daemon for Jeedom plugin')
