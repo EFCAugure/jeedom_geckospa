@@ -161,7 +161,7 @@ public static function sendToDaemon($params) {
     log::add(__CLASS__, 'debug', 'create_or_update_devices -> '. $devices);
     $aDevices=json_decode($devices,true);
     $eqLogics=eqLogic::byType(__CLASS__);
-    foreach ($aDevices as $device) {
+    foreach ($aDevices['spas'] as $device) {
         log::add(__CLASS__, 'debug', '  - spa : ' . json_encode($device));
         
         /*
