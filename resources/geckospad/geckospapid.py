@@ -26,8 +26,10 @@ from optparse import OptionParser
 from os.path import join
 import json
 import argparse
-import requests
-from urllib.parse import quote
+import time
+
+from geckolib import GeckoLocator
+from geckolib import GeckoConstants
 
 try:
 	from jeedom.jeedom import *
@@ -59,7 +61,9 @@ def listen():
 	logging.debug('Listen socket jeedom')
 	jeedom_socket.open()
 
+	_locator = GeckoLocator(CLIENT_ID)
 	
+	"""
 	httpLog()
 
 	if not _jsessionid and not _tokenTahoma:
@@ -75,16 +79,36 @@ def listen():
 			validateToken()
 			getDevicesList()
 			registerListener()	
+	"""
 
 	try:
 		while 1:
 			time.sleep(0.5)
 			read_socket()
-			fetchListener()
+			#fetchListener()
 
 	except KeyboardInterrupt:
 		shutdown()
 
+
+def spaDiscover():
+	_locator.start_discovery()
+
+	# We can perform other operations while this is progressing, like output a dot
+	while not locator.has_had_enough_time:
+		# Could also be `await asyncio.sleep(1)`
+		locator.wait(1)		
+		print(".", end="", flush=True)
+	
+	_locator.complete()
+
+	if len(locator.spas) == 0:
+		logging.error(Cannot continue as there were no spas detected")
+		shutdown()
+
+	logging.debug("Number of spas discover : %i", int(len(locator.spas)))
+
+"""
 def httpLog():
 	logging.getLogger("requests").setLevel(logging.ERROR)
 	logging.getLogger("urllib3").setLevel(logging.ERROR)
@@ -448,27 +472,23 @@ def deleteExecution(executionId):
 	except requests.exceptions.HTTPError as err:
 		logging.error("Error when deleting execution cmd to tahoma -> %s",err)
 		shutdown()
+"""
 # ----------------------------------------------------------------------------
 
 _log_level = "error"
 _socket_port = 55009
 _socket_host = 'localhost'
 _device = 'auto'
-_pidfile = '/tmp/tahomalocalapid.pid'
+_pidfile = '/tmp/geckospapid.pid'
 _apikey = ''
 _callback = ''
 _cycle = 0.3
-_user = ''
-_pwd = ''
-_jsessionid=''
-_pincode=''
-_tokenTahoma=''
-_ipBox='https://192.168.1.28:8443'
-_overkizUrl='https://ha101-1.overkiz.com/enduser-mobile-web/enduserAPI'
-_listenerId=''
+
+_client_id=''
+_locator
 
 parser = argparse.ArgumentParser(
-    description='Desmond Daemon for Jeedom plugin')
+description='Desmond Daemon for Jeedom plugin')
 parser.add_argument("--device", help="Device", type=str)
 parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
 parser.add_argument("--callback", help="Callback", type=str)
@@ -476,10 +496,7 @@ parser.add_argument("--apikey", help="Apikey", type=str)
 parser.add_argument("--cycle", help="Cycle to send event", type=str)
 parser.add_argument("--pid", help="Pid file", type=str)
 parser.add_argument("--socketport", help="Daemon port", type=str)
-parser.add_argument("--user", help="User for local api Tahoma", type=str)
-parser.add_argument("--pswd", help="Password for local api Tahoma", type=str)
-parser.add_argument("--pincode", help="Tahoma pin code", type=str)
-parser.add_argument("--boxLocalIp", help="Tahoma IP", type=str)
+parser.add_argument("--clientId", help="Client Id", type=str)
 args = parser.parse_args()
 
 if args.device:
@@ -496,14 +513,8 @@ if args.cycle:
     _cycle = float(args.cycle)
 if args.socketport:
 	_socket_port = args.socketport
-if args.user:
-	_user = args.user
-if args.pswd:
-	_pwd=args.pswd
-if args.pincode:
-	_pincode=args.pincode
-if args.boxLocalIp:
-	_ipBox='https://' + args.boxLocalIp + ':8443'
+if args.clientId:
+	_client_id = args.clientId
 
 _socket_port = int(_socket_port)
 
@@ -517,10 +528,7 @@ logging.info('Socket host: %s', _socket_host)
 logging.info('PID file: %s', _pidfile)
 logging.info('Apikey: %s', _apikey)
 logging.info('Device: %s', _device)
-logging.info('User: %s', _user)
-logging.info('Pwd: %s', _pwd)
-logging.info('Pin ocde: %s', _pincode)
-logging.info('Box IP: %s', _ipBox)
+logging.info('Client Id : %s', clientId)
 logging.info('*-------------------------------------------------------------------------*')
 
 signal.signal(signal.SIGINT, handler)

@@ -33,8 +33,8 @@ class geckospa extends eqLogic {
         }
     }
     $return['launchable'] = 'ok';
-    $user = config::byKey('user', __CLASS__); // exemple si votre démon à besoin de la config user,
-    $pswd = config::byKey('password', __CLASS__); // password,
+    //$user = config::byKey('user', __CLASS__); // exemple si votre démon à besoin de la config user,
+    //$pswd = config::byKey('password', __CLASS__); // password,
     // $clientId = config::byKey('clientId', __CLASS__); // et clientId
     $portDaemon=config::byKey('daemonPort', __CLASS__);
     if ($user == '') {
@@ -63,12 +63,13 @@ public static function deamon_start() {
   $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
   $cmd .= ' --socketport ' . config::byKey('socketport', __CLASS__, '55009'); // port du daemon
   $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/geckospa/core/php/jeegeckospa.php'; // chemin de la callback url 
-  $cmd .= ' --user "' . trim(str_replace('"', '\"', config::byKey('user', __CLASS__))) . '"'; // user compte somfy
-  $cmd .= ' --pswd "' . trim(str_replace('"', '\"', config::byKey('password', __CLASS__))) . '"'; // et password compte Somfy
+  //$cmd .= ' --user "' . trim(str_replace('"', '\"', config::byKey('user', __CLASS__))) . '"'; // user compte somfy
+  //$cmd .= ' --pswd "' . trim(str_replace('"', '\"', config::byKey('password', __CLASS__))) . '"'; // et password compte Somfy
   $cmd .= ' --apikey ' . jeedom::getApiKey(__CLASS__); // l'apikey pour authentifier les échanges suivants
   $cmd .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/geckospad.pid'; // et on précise le chemin vers le pid file (ne pas modifier)
-  $cmd .= ' --pincode "' . trim(str_replace('"', '\"', config::byKey('pincode', __CLASS__))) . '"'; // Pin code box Somfy
-  $cmd .= ' --boxLocalIp "' . trim(str_replace('"', '\"', config::byKey('boxLocalIp', __CLASS__))) . '"'; // IP box somfy
+  //$cmd .= ' --pincode "' . trim(str_replace('"', '\"', config::byKey('pincode', __CLASS__))) . '"'; // Pin code box Somfy
+  //$cmd .= ' --boxLocalIp "' . trim(str_replace('"', '\"', config::byKey('boxLocalIp', __CLASS__))) . '"'; // IP box somfy
+  $cmd .= ' --clientId "' . trim(str_replace('"', '\"', self::guidv4())) . '"'; // IP box somfy
   
   log::add(__CLASS__, 'info', 'Lancement démon');
   $result = exec($cmd . ' >> ' . log::getPathToLog('geckospa_daemon') . ' 2>&1 &'); 
@@ -88,6 +89,16 @@ public static function deamon_start() {
   }
   message::removeAll(__CLASS__, 'unableStartDeamon');
   return true;
+}
+
+private static function guidv4() {
+    $data = random_bytes(16);
+    assert(strlen($data) == 16);
+
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+    
+    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
 
 /* Stop daemon */
