@@ -192,11 +192,11 @@ public static function sendToDaemon($params) {
             
         }
 
-        foreach($spa['cmds'] as $cmds) {
-            log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmds['name'] . ' -> ' . $cmds['state']);
-            $geckoSpaCmd = $eqLogic->getCmd(null, $cmds['name']);
+        foreach($spa['cmds'] as $cmd) {
+            log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmd['name'] . ' -> ' . $cmd['state']);
+            $geckoSpaCmd = $eqLogic->getCmd(null, $cmd['name']);
             if (!is_object($alarme_IMACmd)) {
-                log::add(__CLASS__, 'debug', '          * Create cmd name : ' . $cmds['name'] . ' -> ' . $cmds['state']);
+                log::add(__CLASS__, 'debug', '              * Create cmd name : ' . $cmd['name'] . ' -> ' . $cmd['state'] . '('.json_encode($cmd));
                 //$geckoSpaCmd = new geckospaCmd();
             }
         }
