@@ -194,7 +194,7 @@ public static function sendToDaemon($params) {
 
         foreach($spa['cmds'] as $cmds) {
             log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmds['name'] . ' -> ' . $cmds['state']);
-            $geckoSpaCmd = $this->getCmd(null, $cmds['name']);
+            $geckoSpaCmd = $eqLogic->getCmd(null, $cmds['name']);
             if (!is_object($alarme_IMACmd)) {
                 log::add(__CLASS__, 'debug', '          * Create cmd name : ' . $cmds['name'] . ' -> ' . $cmds['state']);
                 //$geckoSpaCmd = new geckospaCmd();
