@@ -21,7 +21,7 @@ try {
         log::add('geckospa', 'debug', 'Message receive for evenItem -> ' . json_encode($result['eventItem']));
         geckospa::updateItems($result['eventItem']);
     } elseif (isset($result['devicesList'])) {
-        $jsonMefListDevices=str_replace(array('\\','"{','}"'), array(''),json_encode($result['devicesList']));
+        $jsonMefListDevices=str_replace(array('\\','"{','}"'), array('','{','}'),json_encode($result['devicesList']));
 
         log::add('geckospa', 'debug', 'Message receive for devicesList -> ' . $jsonMefListDevices);        
         geckospa::create_or_update_devices($jsonMefListDevices);
