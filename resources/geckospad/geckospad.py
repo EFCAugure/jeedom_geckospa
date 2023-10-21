@@ -120,6 +120,7 @@ def fetchStatesForallSpa(locator):
 
 	for i in range(len(locator.spas)):
 		spa={}
+		logging.debug("jsondums spa : %s", json.dumps(locator.spas[i]))
 		spa['name']=locator.spas[i].name
 		spa['id']=locator.spas[i].identifier_as_string
 		#spa['cmds']=[]
@@ -148,6 +149,7 @@ def state(spaIdentifier):
 	cmds=[]
 
 	logging.debug("		-> Connected")
+	logging.debug("jsondums facade : %s", json.dumps(facade))
 
 	#print(f"		- Watercare mode : {facade.water_care.mode} ;list: {facade.water_care.modes}")
 	cmdWaterCare={}
