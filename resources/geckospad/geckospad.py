@@ -148,10 +148,11 @@ def state(spaIdentifier):
 	cmds=[]
 
 	logging.debug("		-> Connected")
-	logging.debug("jsondums facade : %s", json.dumps(facade))
+	
 
 	#print(f"		- Watercare mode : {facade.water_care.mode} ;list: {facade.water_care.modes}")
 	cmdWaterCare={}
+	logging.debug("jsondums water_care : %s", json.dumps(facade.water_care))
 	cmdWaterCare['name'] = 'water_care'
 	cmdWaterCare['state'] = facade.water_care.mode
 	cmdWaterCare['stateString'] = facade.water_care.monitor
