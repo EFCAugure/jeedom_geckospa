@@ -120,7 +120,6 @@ def fetchStatesForallSpa(locator):
 
 	for i in range(len(locator.spas)):
 		spa={}
-		logging.debug("jsondums spa : %s", json.dumps(locator.spas[i]))
 		spa['name']=locator.spas[i].name
 		spa['id']=locator.spas[i].identifier_as_string
 		#spa['cmds']=[]
