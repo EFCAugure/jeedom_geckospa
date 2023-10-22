@@ -7,7 +7,7 @@
 	"licence" : "AGPL",
 	"author" : "chris94440",
 	"require" : "4.2.0",
-	"category" : "automation protocol",
+	"category" : "devicecommunication",
 	"hasDependency" : false,
 	"hasOwnDeamon" : true,
 	"maxDependancyInstallTime" : 0,
