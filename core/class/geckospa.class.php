@@ -198,6 +198,8 @@ public static function sendToDaemon($params) {
         foreach($spa['cmds'] as $cmd) {
             log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmd['name'] . ' -> ' . $cmd['state']);
           	if (array_key_exists('state',$cmd) && array_key_exists('name',$cmd)) {
+              
+              	//create cmd info state
             	$cmdName=$cmd['name'].'_state';
               	$geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
                 if (!(is_object($geckoSpaCmd))) {
@@ -218,11 +220,42 @@ public static function sendToDaemon($params) {
                 } else {
                   	log::add(__CLASS__, 'debug', '                  -> cmd exist : ' . $geckoSpaCmd->getName() . '|' . $geckoSpaCmd->getType(). '|'.$geckoSpaCmd->getSubType());
                 }
+              
+              	
+              	//set or update value
+              	if ($cmd['state'] != '') {
+                  	if(is_bool($cmd['state'])) {
+                      	$geckoSpaCmd->event((boolean) $cmd['state']);
+                    } else {
+	                  	$geckoSpaCmd->event($cmd['state']);
+                    }
+                }
+              
+              	//create cmd action 
+              
+
+            }
+          
+          	if (array_key_exists('stateList',$cmd) && array_key_exists('name',$cmd)) {
+              	foreach($cmd['stateList'] as $state) {
+                    $cmdName=$cmd['name'].'_'.$state;
+                    $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
+                    if (!(is_object($geckoSpaCmd))) {
+                        $geckoSpaCmd = new geckospaCmd();
+                        $geckoSpaCmd->setType('action');
+                        $geckoSpaCmd->setIsVisible(1);
+                        $geckoSpaCmd->setSubType('other');
+                        $geckoSpaCmd->setName($cmdName);
+                        $geckoSpaCmd->setLogicalId($cmdName);
+                        $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
+                        $geckoSpaCmd->save();
+                    }
+                }
             }
           
         }
       
-      	$eqLogic->save();
+      	//$eqLogic->save();
 
         /*
         foreach ($eqLogics as $eqLogic) {
