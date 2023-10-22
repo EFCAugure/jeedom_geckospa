@@ -123,6 +123,7 @@ protected static function getSocketPort() {
     return config::byKey('socketport', __CLASS__, 55009);
 }
 
+  /*
 public function getImage() {
     //$typeMef=str_replace(array('internal:','io:'),array(''),$this->getConfiguration('type'));
     //$path='/var/www/html/plugins/geckospa/data/img/custom/' . $typeMef . '.png';
@@ -139,6 +140,7 @@ public function getImage() {
     return 'plugins/geckospa/data/img//gecko_equipment.png';
   	//return str_replace(array('/var/www/html/'),array(''),$path);
 }
+*/
 
 /* Send data to daemon */
 public static function sendToDaemon($params) {
@@ -191,56 +193,36 @@ public static function sendToDaemon($params) {
             $eqLogic=$eqLogic_found;
             
         }
+      
 
         foreach($spa['cmds'] as $cmd) {
             log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmd['name'] . ' -> ' . $cmd['state']);
-            $geckoSpaCmd = $eqLogic->getCmd(null, $cmd['name']);
-            if (!is_object($geckoSpaCmd)) {
-                log::add(__CLASS__, 'debug', '              * Create cmd name : ' . $cmd['name'] . ' -> ' . $cmd['state'] . '('.json_encode($cmd));
+          	if (array_key_exists('state',$cmd) && array_key_exists('name',$cmd)) {
+            	$cmdName=$cmd['name'].'_state';
+              	$geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
+                if (!(is_object($geckoSpaCmd))) {
+                    log::add(__CLASS__, 'debug', '                  -> Create cmd : ' . $cmdName);
+                    $geckoSpaCmd = new geckospaCmd();
+                    $geckoSpaCmd->setName($cmdName);
+                    $geckoSpaCmd->setLogicalId($cmdName);
+                    $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
+                    $geckoSpaCmd->setIsVisible(1); 
+                    $geckoSpaCmd->setType('info');
+                    if(is_bool($cmd['state'])) {
+                      $geckoSpaCmd->setSubType('binary');
+                    } else {
+                      $geckoSpaCmd->setSubType('string');
+                    }  
 
-                if (array_key_exists('state',$cmd)) {
-                    $cmdName=$cmd['name'].'_state';
-                    log::add(__CLASS__, 'debug', '                  -> create cmd : ' . $cmdName);
-                    $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
-                    if (!(is_object($geckoSpaCmd))) {
-                        $geckoSpaCmd = new geckospa();
-                        $geckoSpaCmd->setName($cmdName);
-                        $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
-                        $geckoSpaCmd->setLogicalId($cmdName);
-                        $geckoSpaCmd->setType('info');
-                        $geckoSpaCmd->setIsVisible(1); 
-                        if(is_bool($cmd['state'])) {
-                            $geckoSpaCmd->setSubType('binary');
-                        } else {
-                            $geckoSpaCmd->setSubType('other');
-                        }  
-                        $geckoSpaCmd->save();
-
-                        if (sizeof($cmd['state']) > 2) {
-                            //create cmd List
-                            /*
-                            $listValue='';                                                		
-                            foreach($cmd['state'] as $state) {
-                                $geckoSpaCmd = new geckospa();
-                            }
-                            */
-                            /*
-                            if ($listValue != '') {
-                                $cmdActionScreenshot->setConfiguration('listValue', $listValue);
-                                $cmdActionScreenshot->setDisplay('title_possibility_list','get, delete, take');
-                                $cmdActionScreenshot->setDisplay('message_placeholder',$placeholderMessage);
-                                $cmdActionScreenshot->save();
-                            }
-                            */
-
-                        } else {
-
-                        }     
-                    }            
-                    
+                    $geckoSpaCmd->save();
+                } else {
+                  	log::add(__CLASS__, 'debug', '                  -> cmd exist : ' . $geckoSpaCmd->getName() . '|' . $geckoSpaCmd->getType(). '|'.$geckoSpaCmd->getSubType());
                 }
             }
+          
         }
+      
+      	$eqLogic->save();
 
         /*
         foreach ($eqLogics as $eqLogic) {
