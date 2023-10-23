@@ -233,6 +233,46 @@ def shutdown():
 
 def execCmd(params):	
 	logging.debug(' * Execute command')
+	for i in range(len(_locator.spas)):
+		if params['spaIdentifier'] == _locator.spas[i].identifier_as_string:
+			logging.debug("	- spa %s trouvé", _locator.spas[i].identifier_as_string)
+			"""
+            with locator.spas[0].get_facade() as facade:
+                #print(facade.water_heater)
+                print(f"		- action : {sys.argv[3]} {sys.argv[4]} {sys.argv[5]}")  
+                if sys.argv[3] == 'lights':
+                    print(f"			- light old value : {facade.lights[int(sys.argv[4])].is_on}")
+                    if sys.argv[5] == '1':
+                        print(f"			- put on light {int(sys.argv[4])}")  
+                        facade.lights[int(sys.argv[4])].turn_on()
+                        time.sleep(3)
+                        print(f"			- light new value : {facade.lights[int(sys.argv[4])].is_on}")
+                    else:
+                        print(f"			- put off light {int(sys.argv[4])}")
+                        facade.lights[int(sys.argv[4])].turn_off()
+                        time.sleep(3)
+                        print(f"			- light new value : {facade.lights[int(sys.argv[4])].is_on}")
+                    elif sys.argv[3] == 'pumps':
+                        print(f"		- pump old value : {facade.pumps[int(sys.argv[4])].mode}")
+                        facade.pumps[int(sys.argv[4])].set_mode(sys.argv[5])        
+                        time.sleep(5)
+                        print(f"		- pump new value : {facade.pumps[int(sys.argv[4])].mode}")
+                    elif sys.argv[3] == 'target_temperature':
+                        print(f"		- target temperature old value : {facade.water_heater.target_temperature}")
+                        facade.water_heater.set_target_temperature(sys.argv[5])
+                        time.sleep(5)
+                        print(f"		- target temperature new value : {facade.water_heater.target_temperature}") 
+                    elif sys.argv[3] == 'water_care':
+                        print(f"		- water_care old value : {facade.water_care.monitor}")
+                        facade.water_care.set_mode(sys.argv[5])
+                        time.sleep(5)
+                        print(f"		- water_care new value : {facade.water_care.monitor}") 
+                    else:
+                        print(f" commande non traitee {sys.argv[3]}")
+			"""
+    
+    
+	"""
 	try:
 
 		if params['action'] != "":
@@ -246,11 +286,13 @@ def execCmd(params):
 
 		if params['value'] != "":
 			logging.debug("value : %s",params['value'])
+
 			
 
 	except requests.exceptions.HTTPError as err:
 		logging.error("Error when executing cmd to tahoma -> %s",err)
 		shutdown()
+	"""
 
 # ----------------------------------------------------------------------------
 
