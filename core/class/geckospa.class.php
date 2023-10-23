@@ -247,6 +247,10 @@ public static function sendToDaemon($params) {
                         } else {
                             $geckoSpaCmd->event($cmd['state']);
                         }
+                    } else {
+                      if ($geckoSpaCmd->getSubType() == 'binary') {
+                      		$geckoSpaCmd->event((boolean) false);
+                      }
                     }
                   
                     if (array_key_exists('stateString',$cmd)) {
