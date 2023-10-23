@@ -61,51 +61,51 @@ def listen():
 	logging.debug('Listen socket jeedom for client id' + _client_id)
 	jeedom_socket.open()
 
-	locator = GeckoLocator(_client_id)
-	locator = spaDiscover(locator)
+	#_locator = GeckoLocator(_client_id)
+	spaDiscover()
 	
 	try:
 		while 1:
 			#time.sleep(0.5)
 			time.sleep(5)
 			read_socket()
-			fetchStatesForallSpa(locator)
+			fetchStatesForallSpa()
 
 	except KeyboardInterrupt:
 		shutdown()
 
 
-def spaDiscover(locator):
+def spaDiscover():
 	logging.debug("Discovering spa ...")
-	locator.start_discovery()
+	_locator.start_discovery()
 
 	# We can perform other operations while this is progressing, like output a dot
-	while not locator.has_had_enough_time:
+	while not _locator.has_had_enough_time:
 		# Could also be `await asyncio.sleep(1)`
-		locator.wait(1)		
+		_locator.wait(1)		
 		print(".", end="", flush=True)
 	
-	locator.complete()
+	_locator.complete()
 
-	if len(locator.spas) == 0:
+	if len(_locator.spas) == 0:
 		logging.error("Cannot continue as there were no spas detected")
 		shutdown()
 
-	logging.debug("Number of spas discover : %i", int(len(locator.spas)))
-	return locator
+	logging.debug("Number of spas discover : %i", int(len(_locator.spas)))
+	#return locator
 
-def fetchStatesForallSpa(locator):
+def fetchStatesForallSpa():
 	logging.debug("Get all states for each spa")
 	response={}
 	response['spas']=[]
 
-	for i in range(len(locator.spas)):
+	for i in range(len(_locator.spas)):
 		spa={}
-		spa['name']=locator.spas[i].name
-		spa['id']=locator.spas[i].identifier_as_string
+		spa['name']=_locator.spas[i].name
+		spa['id']=_locator.spas[i].identifier_as_string
 		#spa['cmds']=[]
 		#spa['cmds'].append(state({locator.spas[i].identifier_as_string}))
-		spa['cmds']=state({locator.spas[i].identifier_as_string})
+		spa['cmds']=state({_locator.spas[i].identifier_as_string})
 		response['spas'].append(spa)
 
 	logging.debug("List of spa and states : %s", json.dumps(response))
@@ -560,7 +560,6 @@ _callback = ''
 _cycle = 0.3
 
 _client_id=''
-_locator=''
 
 parser = argparse.ArgumentParser(
 description='Desmond Daemon for Jeedom plugin')
@@ -605,6 +604,8 @@ logging.info('Apikey: %s', _apikey)
 logging.info('Device: %s', _device)
 logging.info('Client Id : %s', _client_id)
 logging.info('*-------------------------------------------------------------------------*')
+
+_locator = GeckoLocator(_client_id)
 
 signal.signal(signal.SIGINT, handler)
 signal.signal(signal.SIGTERM, handler)
