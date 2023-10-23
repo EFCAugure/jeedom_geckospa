@@ -395,10 +395,6 @@ public static function sendToDaemon($params) {
     }
   }
 
-  public static function updateItems($item){
-    log::add(__CLASS__, 'debug', 'updateItems -> '. json_encode($item));
-    $eqLogics=eqLogic::byType(__CLASS__);
-  }
   /*
   * Permet de définir les possibilités de personnalisation du widget (en cas d'utilisation de la fonction 'toHtml' par exemple)
   * Tableau multidimensionnel - exemple: array('custom' => true, 'custom::layout' => false)
@@ -550,69 +546,26 @@ class geckospaCmd extends cmd {
     $eqlogic = $this->getEqLogic();
     $logicalId=$this->getLogicalId();
 
-    $deviceUrl=$this->getConfiguration('deviceURL');
-    $commandName=$this->getConfiguration('commandName');
-    $parameters=$this->getConfiguration('parameters');
-    $execId=$eqlogic->getConfiguration('execId');
-
     $type=$this->type;
     $subType=$this->subType;
-    log::add('geckospa', 'debug','   - Execution demandée ' . $deviceUrl . ' | commande : ' . $commandName . '| parametres : '.$parameters . '| type : ' . $type . '| Sous type : '. $subType . '| exec id : ' . $execId);
+    log::add('geckospa', 'debug','   - Execute ' . $logicalId . ' with options value : ' .json_encode($_options));
 
     if ($this->type == 'action') {
-        switch ($this->subType) {
-            case 'slider':
-                $type = $this->getConfiguration('request');
-                $parameters = str_replace('#slider#', $_options['slider'], $parameters);
+        switch ($logicalId) {
+            case 'target_temperature_slider':
+                $geckoSpaCmd = $eqlogic->getCmd(null, 'target_temperature');                
+                $eqlogic->sendToDaemon(['action'->'execCmd','cmd' => $aExecCmd[0], 'value'=>$geckoSpaCmd->execCmd()]);
+                break;
+            default:
+                $aExecCmd=explode('_',$logicalId);
+                if (sizeof($aExecCmd) > 2 ) {
+                    $eqlogic->sendToDaemon(['action'->'execCmd','cmd' => $aExecCmd[0], 'ind' => $aExecCmd[1], 'value'=>$aExecCmd[2]]);
+                }  elseif (sizeof($aExecCmd) == 2 ) {
+                    $eqlogic->sendToDaemon(['action'->'execCmd','cmd' => $aExecCmd[0], 'value'=>$aExecCmd[2]]);
 
-                $newEventValue = $parameters;
-
-                switch ($type) {
-                    case 'orientation':
-                        if ($commandName == "setOrientation") {
-                            $parameters = array_map('intval', explode(",", $parameters));
-                            $eqlogic->sendToDaemon(['action' => 'execCmd', 'deviceUrl' => $deviceURL, 'commandName'=>$commandName, 'parameters' =>  $parameters, 'name' =>  $this->getName(), 'execId' => $execId]);
-                              return;
-                        }
-                        break;
-                    case 'closure':
-                        if ($commandName == "setClosure") {
-                            $parameters = 100 - $parameters;
-
-                            $parameters = array_map('intval', explode(",", $parameters));
-                            $eqlogic->sendToDaemon(['action' => 'execCmd', 'deviceUrl' => $deviceURL, 'commandName'=>$commandName, 'parameters' =>  $parameters, 'name' =>  $this->getName(), 'execId' => $execId]);
-
-                            return;
-                        }
-                        break;
-                }
-            case 'select':
-                if ($commandName == 'setLockedUnlocked') {
-                    $parameters = str_replace('#select#', $_options['select'], $parameters);
                 }
                 break;
-          	case 'other':
-            	//$parameters = array_map('intval', explode(",", $parameters));
-            	$eqlogic->sendToDaemon(['action' => 'execCmd', 'deviceUrl' => $deviceUrl, 'commandName'=>$commandName, 'parameters' =>  $parameters, 'name' =>  $this->getName(), 'execId' => $execId]);
-            	return;
-           
         }
-
-        if ($this->getConfiguration('nparams') == 0) {
-            $parameters = "";
-        } else if ($commandName == "setClosure") {
-            $parameters = array_map('intval', explode(",", $parameters));
-        } else {
-            $parameters = explode(",", $parameters);
-        }
-
-        if ($commandName == "cancelExecutions") {
-            $execId = $parameters[0];
-
-            log::add('geckospa', 'debug', "will cancelExecutions: (" . $execId . ")");
-            
-        }
-        return;
     }
 
     if ($this->type == 'info') {

@@ -25,8 +25,6 @@ try {
 
         log::add('geckospa', 'debug', 'Message receive for devicesList -> ' . $jsonMefListDevices);        
         geckospa::create_or_update_devices($jsonMefListDevices);
-   //}else {
-    //    log::add('geckospa', 'error', 'unknown message received from daemon'); //remplacez template par l'id de votre plugin
     }
     log::add('geckospa', 'debug', '*-----------------------------------------------------------------------------*');
 } catch (Exception $e) {

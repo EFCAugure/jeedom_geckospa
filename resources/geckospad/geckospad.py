@@ -64,31 +64,12 @@ def listen():
 	locator = GeckoLocator(_client_id)
 	locator = spaDiscover(locator)
 	
-	"""
-	httpLog()
-
-	if not _jsessionid and not _tokenTahoma:
-		loginTahoma()
-
-	if _jsessionid:
-		tahoma_token()
-
-		if not os.path.exists('/var/www/html/plugins/tahomalocalapi/resources/tahomalocalapid/overkiz-root-ca-2048.crt'):
-			downloadTahomaCertificate()
-
-		if _tokenTahoma:
-			validateToken()
-			getDevicesList()
-			registerListener()	
-	"""
-
 	try:
 		while 1:
 			#time.sleep(0.5)
 			time.sleep(5)
 			read_socket()
 			fetchStatesForallSpa(locator)
-			#fetchListener()
 
 	except KeyboardInterrupt:
 		shutdown()
@@ -249,6 +230,27 @@ def shutdown():
 	logging.debug("Exit 0")
 	sys.stdout.flush()
 	os._exit(0)
+
+def execCmd(params):	
+	logging.debug(' * Execute command')
+	try:
+
+		if params['action'] != "":
+			logging.debug("Action : %s",params['action'])
+
+		if params['cmd'] != "":
+			logging.debug("cmd : %s",params['cmd'])
+
+		if params['ind'] != "":
+			logging.debug("Indice : %s",params['ind'])
+
+		if params['value'] != "":
+			logging.debug("value : %s",params['value'])
+			
+
+	except requests.exceptions.HTTPError as err:
+		logging.error("Error when executing cmd to tahoma -> %s",err)
+		shutdown()
 
 """
 def httpLog():
@@ -494,52 +496,7 @@ def unregisterListener():
 	except requests.exceptions.HTTPError as err:
 		logging.error("Error when unregister listener to tahoma -> %s",err)
 
-def execCmd(params):	
-	logging.debug(' * Execute command')
-	try:
 
-		if params['commandName'] == "stop":
-			deleteExecutionForADevice(params['deviceUrl'])
-
-		url = _ipBox +'/enduser-mobile-web/1/enduserAPI/exec/apply'
-
-		payload=json.dumps({
-				"label": params['commandName'],								
-				"actions": [
-				{
-				"commands": [
-					{
-					"name": params['name'],
-					"parameters": [
-						params['parameters']
-					]
-					}
-				],
-				"deviceURL": params['deviceUrl']
-				}
-			]
-		})
-		
-		headers = {
-			'Content-Type' : 'application/json',
-			'Authorization' : 'Bearer ' + _tokenTahoma
-		}
-
-		logging.debug("	- payload :  %s", payload)
-		response = requests.request("POST", url, verify=False, headers=headers, data=payload)
-
-		if response.status_code and (response.status_code == 200):
-			logging.debug("ExecCmd http : %s", response.status_code)
-			if response.json().get('execId'):
-				logging.debug("Execution id : %s", response.json().get('execId'))
-		else:
-			logging.error("Http code : %s", response.status_code)
-			logging.error("Response : %s", response.json())
-			logging.error("Response header : %s", response.headers)
-			shutdown()
-	except requests.exceptions.HTTPError as err:
-		logging.error("Error when executing cmd to tahoma -> %s",err)
-		shutdown()
 
 def deleteExecutionForADevice(deviceUrl):
 	logging.debug(' * Delete execution for a device: ' + deviceUrl)
