@@ -208,42 +208,48 @@ public static function sendToDaemon($params) {
         foreach($spa['cmds'] as $cmd) {
             log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmd['name'] . ' -> ' . $cmd['state']);
           	if (array_key_exists('state',$cmd) && array_key_exists('name',$cmd)) {
-              
-              	//create cmd info state
-            	$cmdName=$cmd['name'].'_state';
-              	$geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
-                if (!(is_object($geckoSpaCmd))) {
-                    log::add(__CLASS__, 'debug', '                  -> Create cmd : ' . $cmdName);
-                    $geckoSpaCmd = new geckospaCmd();
-                    $geckoSpaCmd->setName(self::buildCmdName($cmdName));
-                    $geckoSpaCmd->setLogicalId($cmdName);
-                    $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
-                    $geckoSpaCmd->setIsVisible(1); 
-                    $geckoSpaCmd->setType('info');
-                    if(is_bool($cmd['state'])) {
-                      $geckoSpaCmd->setSubType('binary');
-                    } else {
-                      $geckoSpaCmd->setSubType('string');
-                    }  
-
-                    $geckoSpaCmd->save();
-                } else {
-                  	log::add(__CLASS__, 'debug', '                  -> cmd exist : ' . $geckoSpaCmd->getName() . '|' . $geckoSpaCmd->getType(). '|'.$geckoSpaCmd->getSubType());
-                }
-              
-              	
-              	//set or update value
-              	if ($cmd['state'] != '') {
-                  	if(is_bool($cmd['state'])) {
-                      	$geckoSpaCmd->event((boolean) $cmd['state']);
-                    } else {
-	                  	$geckoSpaCmd->event($cmd['state']);
+                //create cmd info state
+                $cmdName=$cmd['name'].'_state';
+                $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
+                if ($cmd['name'] == 'waterHeater') {
+                    if (!(is_object($geckoSpaCmd))) {
+                        log::add(__CLASS__, 'debug', '                  -> Create cmds linked to waterheater : ' . $cmdName);
                     }
-                }
-              
-              	//create cmd action 
-              
+                } else             
+                    
+                    if (!(is_object($geckoSpaCmd))) {
+                        log::add(__CLASS__, 'debug', '                  -> Create cmd : ' . $cmdName);
+                        $geckoSpaCmd = new geckospaCmd();
+                        $geckoSpaCmd->setName(self::buildCmdName($cmdName));
+                        $geckoSpaCmd->setLogicalId($cmdName);
+                        $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
+                        $geckoSpaCmd->setIsVisible(1); 
+                        $geckoSpaCmd->setType('info');
+                        if(is_bool($cmd['state'])) {
+                        $geckoSpaCmd->setSubType('binary');
+                        } else {
+                        $geckoSpaCmd->setSubType('string');
+                        }  
 
+                        $geckoSpaCmd->save();
+                    } else {
+                        log::add(__CLASS__, 'debug', '                  -> cmd exist : ' . $geckoSpaCmd->getName() . '|' . $geckoSpaCmd->getType(). '|'.$geckoSpaCmd->getSubType());
+                    }
+                
+                    
+                    //set or update value
+                    if ($cmd['state'] != '') {
+                        if(is_bool($cmd['state'])) {
+                            $geckoSpaCmd->event((boolean) $cmd['state']);
+                        } else {
+                            $geckoSpaCmd->event($cmd['state']);
+                        }
+                    }
+                
+                    //create cmd action 
+                
+
+                }
             }
           
           	if (array_key_exists('stateList',$cmd) && array_key_exists('name',$cmd)) {
@@ -729,16 +735,10 @@ public static function sendToDaemon($params) {
   }
 
   private function buildCmdName($cmdName) {
-    log::add(__CLASS__, 'debug', __FUNCTION__ . ' -> ' .  $cmdName);
     $aCmdName=explode('_',$cmdName);
     if (sizeof($aCmdName) > 2) {
-      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' sup 2  ' .  self::getcmdName($aCmdName[0]));
-      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' sup 2  ' .  $aCmdName[1]);
-      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' sup 2  ' .  self::getCmdState($aCmdName[2]));	
         return self::getcmdName($aCmdName[0]) . ' ' . $aCmdName[1] . ' ' . self::getCmdState($aCmdName[2]);
     } else {
-      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' inf 3  ' .  self::getcmdName($aCmdName[0]));
-      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' inf 3  ' .  self::getCmdState($aCmdName[1]));
         return self::getcmdName($aCmdName[0]) . ' ' . self::getCmdState($aCmdName[1]);
     }    
   }
