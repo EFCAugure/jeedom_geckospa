@@ -337,7 +337,7 @@ public static function sendToDaemon($params) {
             
             $geckoSpaCmd->save();
         }
-        $geckoSpaCmd->event($cmd['current_temp'])
+        $geckoSpaCmd->event($cmd['current_temp']);
 
     }
 
@@ -381,14 +381,14 @@ public static function sendToDaemon($params) {
             }
 
             if (array_key_exists('max_temp',$cmd) ) {
-                $geckoSpaCmd->setConfiguration('max_temp',$cmd['max_temp']);
+                $geckoSpaCmd->setConfiguration('maxValue',$cmd['max_temp']);
             }
             
             $geckoSpaCmd->save();
         }
 
         $geckoSpaCmd = $eqLogic->getCmd(null, 'target_temperature');
-        if (!(is_object($geckoSpaCmd))) {
+        if (is_object($geckoSpaCmd)) {
             $geckoSpaCmd->event($cmd['target_temperature']);
         }
 
