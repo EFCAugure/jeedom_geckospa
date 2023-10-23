@@ -19,6 +19,39 @@
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class geckospa extends eqLogic {
+
+    public static function getcmdName($name) {
+        $translate = [
+            'lights' => 'Lumière',
+            'pumps' => 'Pompe',
+            'watercare' => 'Traitement de l\'eau',
+            'sensorBinary' => 'Capteur'
+
+        ];
+        log::add(__CLASS__, 'debug', __FUNCTION__ .' '. $name . ' -> ' . $translate($name));
+        return $translate($name);
+
+    }
+
+    public static function getCmdState($state) {
+        $translate = [
+            'Away From Home' => 'En dehors de la maison',
+            'Energy Saving' => 'Economie d\énergie',
+            'Standard' => 'Standard',
+            'Super Energy Saving' => 'Super economie d\énergie',
+            'Weekender' => 'Week-end',
+            'state' => 'Etat',
+            'ON' => 'On',
+            'OFF' => 'Off',
+            'LO' => 'Doucement',
+            'HI' => 'Fort'
+        ];
+        
+        log::add(__CLASS__, 'debug', __FUNCTION__ .' '. $state . ' -> ' . $translate($state));
+        return $translate($state);
+
+    }
+    
   /* Gestion du démon */
   public static function deamon_info() {
     $return = array();
