@@ -133,24 +133,11 @@ protected static function getSocketPort() {
     return config::byKey('socketport', __CLASS__, 55009);
 }
 
-  /*
+ 
 public function getImage() {
-    //$typeMef=str_replace(array('internal:','io:'),array(''),$this->getConfiguration('type'));
-    //$path='/var/www/html/plugins/geckospa/data/img/custom/' . $typeMef . '.png';
-
-    if (!(file_exists($path))) {
-        $path = '/var/www/html/plugins/geckospa/data/img/' . $typeMef . '.png';
-        if (!(file_exists($path))) {
-            $path = 'plugins/geckospa/data/img/io_logo.png';
-        }
-    }
-
-    
-    //log::add(__CLASS__, 'debug', 'getImage '. $this->getConfiguration('type') . ' -> ' . $path);
     return 'plugins/geckospa/data/img//gecko_equipment.png';
-  	//return str_replace(array('/var/www/html/'),array(''),$path);
 }
-*/
+
 
 /* Send data to daemon */
 public static function sendToDaemon($params) {
