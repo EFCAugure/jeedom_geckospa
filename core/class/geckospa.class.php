@@ -51,7 +51,7 @@ class geckospa extends eqLogic {
         return $translate($state);
 
     }
-    
+
   /* Gestion du démon */
   public static function deamon_info() {
     $return = array();
@@ -749,6 +749,15 @@ public static function sendToDaemon($params) {
          */
      }
 
+  }
+
+  private function buildCmdName($cmdName) {
+    $aCmdName=explode('_',$cmdName);
+    if (sizeof($aCmdName)) {
+        return self::getcmdName($aCmdName[0]) . ' ' . $aCmdName[1] . self::getCmdState($aCmdName[2]);
+    } else {
+        return self::getcmdName($aCmdName[0]) . ' ' . self::getCmdState($aCmdName[2]);
+    }    
   }
 
   public static function updateItems($item){
