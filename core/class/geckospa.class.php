@@ -287,6 +287,7 @@ public static function sendToDaemon($params) {
           
           	if ($cmd['name'] == 'waterHeater') {
               	log::add(__CLASS__, 'debug', '                  -> Create cmds linked to waterheater function');
+                self::createCmdsWaterHeater($eqLogic,$cmd);
             }
           
           	//create cmd action 
@@ -310,6 +311,89 @@ public static function sendToDaemon($params) {
         }
       
      }
+
+  }
+
+  private static function createCmdsWaterHeater($eqLogic,$cmd) {
+    if (array_key_exists('current_temp',$cmd) ) {
+        $cmdName='Température eau';
+        $geckoSpaCmd = $eqLogic->getCmd(null, 'current_temp');
+        if (!(is_object($geckoSpaCmd))) {
+            $geckoSpaCmd = new geckospaCmd();
+            $geckoSpaCmd->setName($cmdName);
+            $geckoSpaCmd->setLogicalId('current_temp');
+            $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
+            $geckoSpaCmd->setIsVisible(1); 
+            $geckoSpaCmd->setType('info');
+            $geckoSpaCmd->setSubType('numeric');
+            
+            if (array_key_exists('min_temp',$cmd) ) {
+                $geckoSpaCmd->setConfiguration('minValue',0);
+            }
+
+            if (array_key_exists('max_temp',$cmd) ) {
+                $geckoSpaCmd->setConfiguration('max_temp',50);
+            }
+            
+            $geckoSpaCmd->save();
+        }
+        $geckoSpaCmd->event($cmd['current_temp'])
+
+    }
+
+    $geckoSpaCmd->event($cmd['current_temp']);
+
+
+    if (array_key_exists('target_temperature',$cmd) ) {
+        $cmdName='Chauffer eau';
+        $geckoSpaCmd = $eqLogic->getCmd(null, 'target_temperature_slider');
+        if (!(is_object($geckoSpaCmd))) {
+            $geckoSpaCmdAskTemp = new geckospaCmd();
+            $geckoSpaCmdAskTemp->setName('Température demandée');
+            $geckoSpaCmdAskTemp->setLogicalId('target_temperature');
+            $geckoSpaCmdAskTemp->setEqLogic_id($eqLogic->getId());
+            $geckoSpaCmdAskTemp->setIsVisible(1); 
+            $geckoSpaCmdAskTemp->setType('info');
+            $geckoSpaCmdAskTemp->setSubType('numeric');
+            
+            if (array_key_exists('min_temp',$cmd) ) {
+                $geckoSpaCmdAskTemp->setConfiguration('minValue',$cmd['min_temp']);
+            }
+
+            if (array_key_exists('max_temp',$cmd) ) {
+                $geckoSpaCmdAskTemp->setConfiguration('max_temp',$cmd['max_temp']);
+            }
+            
+            $geckoSpaCmdAskTemp->save();
+
+
+            $geckoSpaCmd = new geckospaCmd();
+            $geckoSpaCmd->setName($cmdName);
+            $geckoSpaCmd->setLogicalId('target_temperature_slider');
+            $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
+            $geckoSpaCmd->setIsVisible(1); 
+            $geckoSpaCmd->setType('action');
+            $geckoSpaCmd->setSubType('slider');
+            $geckoSpaCmd->setValue($geckoSpaCmdAskTemp->getId());
+            
+            if (array_key_exists('min_temp',$cmd) ) {
+                $geckoSpaCmd->setConfiguration('minValue',$cmd['min_temp']);
+            }
+
+            if (array_key_exists('max_temp',$cmd) ) {
+                $geckoSpaCmd->setConfiguration('max_temp',$cmd['max_temp']);
+            }
+            
+            $geckoSpaCmd->save();
+        }
+
+        $geckoSpaCmd = $eqLogic->getCmd(null, 'target_temperature');
+        if (!(is_object($geckoSpaCmd))) {
+            $geckoSpaCmd->event($cmd['target_temperature']);
+        }
+
+
+    }
 
   }
 
