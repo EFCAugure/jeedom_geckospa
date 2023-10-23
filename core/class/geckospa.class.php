@@ -248,6 +248,10 @@ public static function sendToDaemon($params) {
               
             }
           
+          	if ($cmd['name'] == 'waterHeater') {
+              	log::add(__CLASS__, 'debug', '                  -> Create cmds linked to waterheater function');
+            }
+          
           	//create cmd action 
           	if (array_key_exists('stateList',$cmd) && array_key_exists('name',$cmd)) {
               	foreach($cmd['stateList'] as $state) {
