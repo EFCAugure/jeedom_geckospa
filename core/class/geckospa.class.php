@@ -19,6 +19,38 @@
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class geckospa extends eqLogic {
+
+    public static function getcmdName($name) {
+        $translate = [
+            'lights' => 'Lumière',
+            'pumps' => 'Pompe',
+            'watercare' => 'Traitement de l\'eau',
+            'sensorBinary' => 'Capteur'
+
+        ];
+        
+        return $translate($name);
+
+    }
+
+    public static function getCmdState($state) {
+        $translate = [
+            'Away From Home' => 'En dehors de la maison',
+            'Energy Saving' => 'Economie d\énergie',
+            'Standard' => 'Standard',
+            'Super Energy Saving' => 'Super economie d\énergie',
+            'Weekender' => 'Week-end',
+            'state' => 'Etat',
+            'ON' => 'On',
+            'OFF' => 'Off',
+            'LO' => 'Doucement',
+            'HI' => 'Fort'
+        ];
+        
+        return $translate($state);
+
+    }
+    
   /* Gestion du démon */
   public static function deamon_info() {
     $return = array();
@@ -123,24 +155,25 @@ protected static function getSocketPort() {
     return config::byKey('socketport', __CLASS__, 55009);
 }
 
-  /*
+*
 public function getImage() {
     //$typeMef=str_replace(array('internal:','io:'),array(''),$this->getConfiguration('type'));
     //$path='/var/www/html/plugins/geckospa/data/img/custom/' . $typeMef . '.png';
 
+    /*
     if (!(file_exists($path))) {
         $path = '/var/www/html/plugins/geckospa/data/img/' . $typeMef . '.png';
         if (!(file_exists($path))) {
             $path = 'plugins/geckospa/data/img/io_logo.png';
         }
     }
-
+*/
     
     //log::add(__CLASS__, 'debug', 'getImage '. $this->getConfiguration('type') . ' -> ' . $path);
     return 'plugins/geckospa/data/img//gecko_equipment.png';
   	//return str_replace(array('/var/www/html/'),array(''),$path);
 }
-*/
+
 
 /* Send data to daemon */
 public static function sendToDaemon($params) {
@@ -205,7 +238,7 @@ public static function sendToDaemon($params) {
                 if (!(is_object($geckoSpaCmd))) {
                     log::add(__CLASS__, 'debug', '                  -> Create cmd : ' . $cmdName);
                     $geckoSpaCmd = new geckospaCmd();
-                    $geckoSpaCmd->setName($cmdName);
+                    $geckoSpaCmd->setName(self::buildCmdName($cmdName));
                     $geckoSpaCmd->setLogicalId($cmdName);
                     $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
                     $geckoSpaCmd->setIsVisible(1); 
@@ -236,7 +269,7 @@ public static function sendToDaemon($params) {
 
             }
           
-          	if (array_key_exists('stateList',$cmd) && array_key_exists('name',$cmd)) {
+
               	foreach($cmd['stateList'] as $state) {
                     $cmdName=$cmd['name'].'_'.$state;
                     $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
@@ -245,7 +278,7 @@ public static function sendToDaemon($params) {
                         $geckoSpaCmd->setType('action');
                         $geckoSpaCmd->setIsVisible(1);
                         $geckoSpaCmd->setSubType('other');
-                        $geckoSpaCmd->setName($cmdName);
+                        $geckoSpaCmd->setName(self::buildCmdName($cmdName));
                         $geckoSpaCmd->setLogicalId($cmdName);
                         $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
                         $geckoSpaCmd->save();
@@ -716,6 +749,15 @@ public static function sendToDaemon($params) {
          */
      }
 
+  }
+
+  private function buildCmdName($cmdName) {
+    $aCmdName=explode('_',$cmdName);
+    if (sizeof($aCmdName)) {
+        return self::getcmdName($aCmdName[0]) . ' ' . $aCmdName[1] . self::getCmdState($aCmdName[2]);
+    } else {
+        return self::getcmdName($aCmdName[0]) . ' ' . self::getCmdState($aCmdName[2]);
+    }    
   }
 
   public static function updateItems($item){

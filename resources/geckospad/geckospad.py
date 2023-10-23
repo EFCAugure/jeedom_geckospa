@@ -152,7 +152,7 @@ def state(spaIdentifier):
 
 	#print(f"		- Watercare mode : {facade.water_care.mode} ;list: {facade.water_care.modes}")
 	cmdWaterCare={}
-	cmdWaterCare['name'] = 'water_care'
+	cmdWaterCare['name'] = 'waterCare'
 	cmdWaterCare['state'] = facade.water_care.mode
 	cmdWaterCare['stateString'] = facade.water_care.monitor
 	cmdWaterCare['stateList'] = facade.water_care.modes
@@ -171,7 +171,7 @@ def state(spaIdentifier):
 
 	#print(f"		- Heater : {facade.water_heater.min_temp} | {facade.water_heater.max_temp} | {facade.water_heater.current_temperature} | {facade.water_heater.temperature_unit} ")
 	cmdHeater={}
-	cmdHeater['name'] = 'water_heater'
+	cmdHeater['name'] = 'waterHeater'
 	cmdHeater['min_temp'] = facade.water_heater.min_temp
 	cmdHeater['max_temp'] = facade.water_heater.max_temp
 	cmdHeater['current_temp'] = facade.water_heater.current_temperature
@@ -211,7 +211,7 @@ def state(spaIdentifier):
 		del cmdSensors
 	for i in range(len(facade.binary_sensors)):
 		cmdSensors = {}
-		cmdSensors['name'] = "sensor_binary_" + str(i)
+		cmdSensors['name'] = "sensorBinary_" + str(i)
 		cmdSensors['label'] = facade.binary_sensors[i].accessor.tag
 		cmdSensors['state'] = facade.binary_sensors[i].state
 		cmdSensors['unit'] = facade.binary_sensors[i].unit_of_measurement
