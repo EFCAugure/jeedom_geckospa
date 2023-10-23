@@ -556,33 +556,17 @@ class geckospaCmd extends cmd {
           case 'target_temperature_slider':
               	$geckoSpaCmd = $eqlogic->getCmd(null, 'target_temperature');
           		$value=$_options['slider'];
-          		$eqlogic->sendToDaemon(['action' => 'execCmd', 'cmd' => $aExecCmd[0], , 'ind' => 0, 'value'=> $value]);
+          		$eqlogic->sendToDaemon(['action' => 'execCmd', 'cmd' => $aExecCmd[0], 'ind' => 0, 'value'=> $value]);
               	break;
           default:
              	if (sizeof($aExecCmd) > 2 ) {
                     $eqlogic->sendToDaemon(['action'=>'execCmd','cmd' => $aExecCmd[0], 'ind' => $aExecCmd[1], 'value'=>$aExecCmd[2]]);
                 }  elseif (sizeof($aExecCmd) == 2 ) {
-                    $eqlogic->sendToDaemon(['action'=>'execCmd','cmd' => $aExecCmd[0], , 'ind' => 0, 'value'=>$aExecCmd[2]]);
+                    $eqlogic->sendToDaemon(['action'=>'execCmd','cmd' => $aExecCmd[0], 'ind' => 0, 'value'=>$aExecCmd[2]]);
 
                 }
                 break;
       }
-      /*
-        switch ($logicalId) {
-            case 'target_temperature_slider':
-                //$geckoSpaCmd = $eqlogic->getCmd(null, 'target_temperature');                
-                //$eqlogic->sendToDaemon(['action'->'execCmd','cmd' => $aExecCmd[0], 'value'=>$geckoSpaCmd->execCmd()]);
-                break;
-            default:
-                $aExecCmd=explode('_',$logicalId);
-                if (sizeof($aExecCmd) > 2 ) {
-                    $eqlogic->sendToDaemon(['action'->'execCmd','cmd' => $aExecCmd[0], 'ind' => $aExecCmd[1], 'value'=>$aExecCmd[2]]);
-                }  elseif (sizeof($aExecCmd) == 2 ) {
-                    $eqlogic->sendToDaemon(['action'->'execCmd','cmd' => $aExecCmd[0], 'value'=>$aExecCmd[2]]);
-
-                }
-                break;
-        }*/
     }
     if ($this->type == 'info') {
         return;
