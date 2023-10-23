@@ -174,6 +174,7 @@ public static function sendToDaemon($params) {
     log::add(__CLASS__, 'debug', 'create_or_update_devices -> '. $spas);
     $aSpas=json_decode($spas,true);
     $eqLogics=eqLogic::byType(__CLASS__);
+
     foreach ($aSpas['spas'] as $spa) {
         log::add(__CLASS__, 'debug', '  - spa : ' . json_encode($spa));
 
@@ -239,10 +240,20 @@ public static function sendToDaemon($params) {
                     }
 
 
+                    //set or update value
+                    if ($cmd['state'] != '') {
+                        if(is_bool($cmd['state'])) {
+                            $geckoSpaCmd->event((boolean) $cmd['state']);
+                        } else {
+                            $geckoSpaCmd->event($cmd['state']);
+                        }
+                    }
+                  
                     if (array_key_exists('stateString',$cmd)) {
                         $cmdName=$cmd['name'].'_stateString';
                         $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
                         if (!(is_object($geckoSpaCmd))) {
+                          	$geckoSpaCmd = new geckospaCmd();
                             $geckoSpaCmd->setName(self::buildCmdName($cmdName));
                             $geckoSpaCmd->setLogicalId($cmdName);
                             $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
@@ -253,19 +264,10 @@ public static function sendToDaemon($params) {
                         }
                     }
 
-                    //set or update value
-                    if ($cmd['state'] != '') {
-                        if(is_bool($cmd['state'])) {
-                            $geckoSpaCmd->event((boolean) $cmd['state']);
-                        } else {
-                            $geckoSpaCmd->event($cmd['state']);
-                        }
-                    }
-
-                    if ($cmd['stateString'] != '') {
+                    if ($cmd['stateList'] != '') {
                         if ($cmd['state'] != '') {
                             $i=1;
-                            foreach($cmd['stateString'] as $stateString) {
+                            foreach($cmd['stateList'] as $stateString) {
                                 if ( $cmd['state'] == $i) {
                                     $geckoSpaCmd->event($stateString);
                                     break;
@@ -273,10 +275,11 @@ public static function sendToDaemon($params) {
                                 $i++;
                             }
                         }
-                    }                    
+                    }
                 }  
               
             }
+          
           
           	if ($cmd['name'] == 'waterHeater') {
               	log::add(__CLASS__, 'debug', '                  -> Create cmds linked to waterheater function');
@@ -310,7 +313,7 @@ public static function sendToDaemon($params) {
     $aCmdName=explode('_',$cmdName);
     if (sizeof($aCmdName) > 2) {
         return self::getcmdName($aCmdName[0]) . ' ' . $aCmdName[1] . ' ' . self::getCmdState($aCmdName[2]);
-    } elseif ( sizeof($aCmdName) == 2{
+    } elseif ( sizeof($aCmdName) == 2){
         return self::getcmdName($aCmdName[0]) . ' ' . self::getCmdState($aCmdName[1]);
     } else {
         return $cmdName;
@@ -320,65 +323,6 @@ public static function sendToDaemon($params) {
   public static function updateItems($item){
     log::add(__CLASS__, 'debug', 'updateItems -> '. json_encode($item));
     $eqLogics=eqLogic::byType(__CLASS__);
-    if (array_key_exists('deviceURL', $item)) {        
-        $found = false;
-        $eqLogic_found;        
-
-        foreach ($eqLogics as $eqLogic) {
-            if ($item['deviceURL'] == $eqLogic->getConfiguration('deviceURL')) {
-                $eqLogic_found = $eqLogic;
-                $found = true;
-                break;
-            }
-        }
-    
-        if (!$found) {
-            log::add(__CLASS__, 'error', ' - évènement sur équipement :' .$item['deviceURL'].' non géré par le plugin ... relancer le daemon pour forcer sa création');
-        } else {
-            foreach ($item['deviceStates'] as $state) {
-                log::add(__CLASS__, 'debug','   - maj equipement ' . $item['deviceURL'] . ' | commande : ' . $state['name'] . '| valeur : '.$state['value']);
-                $cmd=$eqLogic_found->getCmd('info',$state['name'],true, false);
-            
-                if (is_object($cmd)){            
-                    if ($state['name'] == $cmd->getConfiguration('type')) {
-                        $cmd->setCollectDate('');
-
-                        $value = $state['value'];
-                        if ($state['name'] == "core:ClosureState") {
-                            $value = 100 - $value;
-                        }
-                        log::add(__CLASS__, 'debug','       -> valeur MAJ : ' . $value);
-                        $cmd->event($value);
-                    }
-                }
-            }    
-        }
-    } elseif (array_key_exists('execId', $item)) { 
-        if (array_key_exists('actions',$item)) {
-            foreach($item['actions'] as $action) {
-                if (array_key_exists('deviceURL',$action)) {               
-                    foreach ($eqLogics as $eqLogic) {   
-                        if ($action['deviceURL'] == $eqLogic->getConfiguration('deviceURL')) {
-                            //log::add(__CLASS__, 'debug','   - store execution id  ' . $action['execId'] . ' for device ' . $action['deviceURL']);
-                            $eqLogic->setConfiguration('execId',$action['execId']);
-                            $eqLogic->save();
-                            break;
-                        }
-                    }
-                }
-            }
-        } else {
-            if (array_key_exists('newState',$item) && $item['newState'] == 'COMPLETED') {
-                foreach ($eqLogics as $eqLogic) {   
-                    if ($item['execId'] == $eqLogic->getConfiguration('execId')) {
-                        $eqLogic->setConfiguration('execId','');
-                        $eqLogic->save();
-                        break;
-                    }
-                }
-            }
-        }
-    }
   }
   /*
   * Permet de définir les possibilités de personnalisation du widget (en cas d'utilisation de la fonction 'toHtml' par exemple)
