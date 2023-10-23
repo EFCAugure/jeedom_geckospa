@@ -21,34 +21,11 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
 class geckospa extends eqLogic {
 
     public static function getcmdName($name) {
-        $translate = [
-            'lights' => 'Lumière',
-            'pumps' => 'Pompe',
-            'watercare' => 'Traitement de l\'eau',
-            'sensorBinary' => 'Capteur'
-
-        ];
-        log::add(__CLASS__, 'debug', __FUNCTION__ .' '. $name . ' -> ' . $translate($name));
-        return $translate($name);
-
+      	return str_replace(array('lights','pumps','waterCare','sensorBinary','sensor','waterHeater'),array('Lumière','Pompe','Traitement de l\'eau','Capteur binaire','Capteur','Chauffage'),$name);
     }
 
     public static function getCmdState($state) {
-        $translate = [
-            'Away From Home' => 'En dehors de la maison',
-            'Energy Saving' => 'Economie d\énergie',
-            'Standard' => 'Standard',
-            'Super Energy Saving' => 'Super economie d\énergie',
-            'Weekender' => 'Week-end',
-            'state' => 'Etat',
-            'ON' => 'On',
-            'OFF' => 'Off',
-            'LO' => 'Doucement',
-            'HI' => 'Fort'
-        ];
-        
-        log::add(__CLASS__, 'debug', __FUNCTION__ .' '. $state . ' -> ' . $translate($state));
-        return $translate($state);
+      	return str_replace(array('Away From Home','Energy Saving','Standard','Super Energy Saving','Weekender','state','ON','OFF','LO','HI'),array('En dehors de la maison', 'Economie d\énergie', 'Standard','Super economie d\énergie','Week-end', 'Etat','On','Off','Doucement','Fort',),$state);
 
     }
 
@@ -238,7 +215,7 @@ public static function sendToDaemon($params) {
                 if (!(is_object($geckoSpaCmd))) {
                     log::add(__CLASS__, 'debug', '                  -> Create cmd : ' . $cmdName);
                     $geckoSpaCmd = new geckospaCmd();
-                    $geckoSpaCmd->setName($cmdName);
+                    $geckoSpaCmd->setName(self::buildCmdName($cmdName));
                     $geckoSpaCmd->setLogicalId($cmdName);
                     $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
                     $geckoSpaCmd->setIsVisible(1); 
@@ -278,7 +255,7 @@ public static function sendToDaemon($params) {
                         $geckoSpaCmd->setType('action');
                         $geckoSpaCmd->setIsVisible(1);
                         $geckoSpaCmd->setSubType('other');
-                        $geckoSpaCmd->setName($cmdName);
+                        $geckoSpaCmd->setName(self::buildCmdName($cmdName));
                         $geckoSpaCmd->setLogicalId($cmdName);
                         $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
                         $geckoSpaCmd->save();
@@ -752,11 +729,17 @@ public static function sendToDaemon($params) {
   }
 
   private function buildCmdName($cmdName) {
+    log::add(__CLASS__, 'debug', __FUNCTION__ . ' -> ' .  $cmdName);
     $aCmdName=explode('_',$cmdName);
-    if (sizeof($aCmdName)) {
-        return self::getcmdName($aCmdName[0]) . ' ' . $aCmdName[1] . self::getCmdState($aCmdName[2]);
+    if (sizeof($aCmdName) > 2) {
+      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' sup 2  ' .  self::getcmdName($aCmdName[0]));
+      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' sup 2  ' .  $aCmdName[1]);
+      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' sup 2  ' .  self::getCmdState($aCmdName[2]));	
+        return self::getcmdName($aCmdName[0]) . ' ' . $aCmdName[1] . ' ' . self::getCmdState($aCmdName[2]);
     } else {
-        return self::getcmdName($aCmdName[0]) . ' ' . self::getCmdState($aCmdName[2]);
+      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' inf 3  ' .  self::getcmdName($aCmdName[0]));
+      	log::add(__CLASS__, 'debug', __FUNCTION__ . ' inf 3  ' .  self::getCmdState($aCmdName[1]));
+        return self::getcmdName($aCmdName[0]) . ' ' . self::getCmdState($aCmdName[1]);
     }    
   }
 
