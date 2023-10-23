@@ -28,8 +28,8 @@ class geckospa extends eqLogic {
             'sensorBinary' => 'Capteur'
 
         ];
-        
-        return $translate($name);
+        log::add(__CLASS__, 'debug', __FUNCTION__ .' '. $name . ' -> ' . $translate($name));
+        return $translate($name);.
 
     }
 
@@ -47,6 +47,7 @@ class geckospa extends eqLogic {
             'HI' => 'Fort'
         ];
         
+        log::add(__CLASS__, 'debug', __FUNCTION__ .' '. $state . ' -> ' . $translate($state));
         return $translate($state);
 
     }
