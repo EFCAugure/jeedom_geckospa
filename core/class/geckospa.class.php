@@ -25,7 +25,7 @@ class geckospa extends eqLogic {
     }
 
     public static function getCmdState($state) {
-      	return str_replace(array('Away From Home','Energy Saving','Standard','Super Energy Saving','Weekender','state','ON','OFF','LO','HI'),array('En dehors de la maison', 'Economie d\énergie', 'Standard','Super economie d\énergie','Week-end', 'Etat','On','Off','Doucement','Fort',),$state);
+      	return str_replace(array('Away From Home','Energy Saving','Standard','Super Energy Saving','Weekender','state','ON','OFF','LO','HI','stateString'),array('En dehors de la maison', 'Economie d\énergie', 'Standard','Super economie d\énergie','Week-end', 'Etat','On','Off','Doucement','Fort','Etat détail'),$state);
 
     }
 
@@ -209,9 +209,12 @@ public static function sendToDaemon($params) {
             log::add(__CLASS__, 'debug', '          * Cmd name : ' . $cmd['name'] . ' -> ' . $cmd['state']);
           	if (array_key_exists('state',$cmd) && array_key_exists('name',$cmd)) {
 
-               	$cmdName=$cmd['name'].'_state';
+                $cmdName=$cmd['name'].'_state';
+                if (array_key_exists('label',$cmd)) {
+                    $cmdName=$cmd['label'];
+                } 
+               	
               	$geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
-
               	if ($cmd['name'] == 'waterHeater') {
                 	log::add(__CLASS__, 'debug', '                  -> Create cmds linked to waterheater function');
                 } else {
@@ -236,6 +239,20 @@ public static function sendToDaemon($params) {
                     }
 
 
+                    if (array_key_exists('stateString',$cmd)) {
+                        $cmdName=$cmd['name'].'_stateString';
+                        $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
+                        if (!(is_object($geckoSpaCmd))) {
+                            $geckoSpaCmd->setName(self::buildCmdName($cmdName));
+                            $geckoSpaCmd->setLogicalId($cmdName);
+                            $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
+                            $geckoSpaCmd->setIsVisible(1); 
+                            $geckoSpaCmd->setType('info');
+                            $geckoSpaCmd->setSubType('string');
+                            $geckoSpaCmd->save();
+                        }
+                    }
+
                     //set or update value
                     if ($cmd['state'] != '') {
                         if(is_bool($cmd['state'])) {
@@ -244,6 +261,19 @@ public static function sendToDaemon($params) {
                             $geckoSpaCmd->event($cmd['state']);
                         }
                     }
+
+                    if ($cmd['stateString'] != '') {
+                        if ($cmd['state'] != '') {
+                            $i=1;
+                            foreach($cmd['stateString'] as $stateString) {
+                                if ( $cmd['state'] == $i) {
+                                    $geckoSpaCmd->event($stateString);
+                                    break;
+                                }
+                                $i++;
+                            }
+                        }
+                    }                    
                 }  
               
             }
@@ -280,9 +310,11 @@ public static function sendToDaemon($params) {
     $aCmdName=explode('_',$cmdName);
     if (sizeof($aCmdName) > 2) {
         return self::getcmdName($aCmdName[0]) . ' ' . $aCmdName[1] . ' ' . self::getCmdState($aCmdName[2]);
-    } else {
+    } elseif ( sizeof($aCmdName) == 2{
         return self::getcmdName($aCmdName[0]) . ' ' . self::getCmdState($aCmdName[1]);
-    }    
+    } else {
+        return $cmdName;
+    }
   }
 
   public static function updateItems($item){
