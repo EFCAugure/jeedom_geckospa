@@ -397,43 +397,61 @@ public static function sendToDaemon($params) {
 
   public static function updateItems($updateItems) {
     log::add(__CLASS__, 'debug', 'updateItems -> ' . $updateItems);
-    $aSpas=json_decode($spas,true);
+    $aSpas=json_decode($updateItems,true);
     $eqLogics=eqLogic::byType(__CLASS__);
     $found = false;
 
-    if (array_key_exists('id',$aSpas))
-
+    if (array_key_exists('id',$aSpas)) {
+		log::add(__CLASS__, 'debug', '	- spa id : ' . $aSpas['id']);
         foreach ($eqLogics as $eqLogic) {
-            if ($spa['id'] == $eqLogic->getLogicalId()) {
+            if ($aSpas['id'] == $eqLogic->getLogicalId()) {
                 $eqLogic_found = $eqLogic;
                 $found = true;
                 break;
             }
     }
 
-    if (found) {
+    if ($found) {
         if (array_key_exists('cmds',$aSpas))
             foreach($aSpas['cmds'] as $cmd) {
-                if (array_key_exists('state',$cmd) && $cmd['state'] != '') {
+                if (array_key_exists('state',$cmd)) {
+                  	log::add(__CLASS__, 'debug', '		- cmd : ' . $cmd['name'] . '|'.$cmd['label'] . '|'.$cmd['state']);
                     $cmdName=$cmd['name'].'_state';
                     if (array_key_exists('label',$cmd)) {
                         $cmdName=$cmd['label'];
                     } 
                	
+                  	log::add(__CLASS__, 'debug', '	 - search for cmd : ' . $cmdName);
               	    $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
                     if (is_object($geckoSpaCmd)) {
-                        $geckoSpaCmd->event($cmd['state']);
+                      	log::add(__CLASS__, 'debug', '			- update ' . $cmdName . ' by ' . $cmd['state']);
+                      	if ($cmd['state'] != '') {
+                          	
+                            if(is_bool($cmd['state'])) {
+                                //$geckoSpaCmd->event((boolean) $cmd['state']);
+                            } else {
+                                //$geckoSpaCmd->event($cmd['state']);
+                            }
+                        } else {
+                          if ($geckoSpaCmd->getSubType() == 'binary') {
+                                //$geckoSpaCmd->event((boolean) false);
+                          }
+                        }
+                      
+                      	
                     }
                 }
 
                 if ($cmd['name'] == 'waterHeater') {
                     $geckoSpaCmd = $eqLogic->getCmd(null, 'current_temp');
                     if (is_object($geckoSpaCmd)) {
+                      	log::add(__CLASS__, 'debug', '			- update current_temp by ' . $cmd['current_temp']);
                         $geckoSpaCmd->event($cmd['current_temp']);
                     }
 
                     $geckoSpaCmd = $eqLogic->getCmd(null, 'target_temperature');
                     if (is_object($geckoSpaCmd)) {
+                      	log::add(__CLASS__, 'debug', '			- update target_temperature by ' . $cmd['target_temperature']);
                         $geckoSpaCmd->event($cmd['target_temperature']);
                     }
                 }
@@ -464,10 +482,13 @@ public static function sendToDaemon($params) {
   public static function cron() {}
   */
 
-  /*
+ /*
   * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
-  public static function cron5() {}
   */
+  public static function cron5() {
+    self::synchronize();
+  }
+
 
   /*
   * Fonction exécutée automatiquement toutes les 10 minutes par Jeedom
