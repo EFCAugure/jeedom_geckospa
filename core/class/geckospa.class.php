@@ -126,7 +126,7 @@ public static function deamon_stop() {
 
 public static function synchronize() {
     self::sendToDaemon(['action' => 'synchronize']);
-    sleep(5);
+    //sleep(5);
 }
 
 protected static function getSocketPort() {
@@ -135,7 +135,7 @@ protected static function getSocketPort() {
 
  
 public function getImage() {
-    return 'plugins/geckospa/data/img//gecko_equipment.png';
+    return 'plugins/geckospa/data/img/gecko_equipment.png';
 }
 
 
@@ -397,6 +397,50 @@ public static function sendToDaemon($params) {
 
   public static function updateItems($updateItems) {
     log::add(__CLASS__, 'debug', 'updateItems -> ' . $updateItems);
+    $aSpas=json_decode($spas,true);
+    $eqLogics=eqLogic::byType(__CLASS__);
+    $found = false;
+
+    if (array_key_exists('id',$aSpas))
+
+        foreach ($eqLogics as $eqLogic) {
+            if ($spa['id'] == $eqLogic->getLogicalId()) {
+                $eqLogic_found = $eqLogic;
+                $found = true;
+                break;
+            }
+    }
+
+    if (found) {
+        if (array_key_exists('cmds',$aSpas))
+            foreach($aSpas['cmds'] as $cmd) {
+                if (array_key_exists('state',$cmd) && $cmd['state'] != '') {
+                    $cmdName=$cmd['name'].'_state';
+                    if (array_key_exists('label',$cmd)) {
+                        $cmdName=$cmd['label'];
+                    } 
+               	
+              	    $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
+                    if (is_object($geckoSpaCmd)) {
+                        $geckoSpaCmd->event($cmd['state']);
+                    }
+                }
+
+                if ($cmd['name'] == 'waterHeater') {
+                    $geckoSpaCmd = $eqLogic->getCmd(null, 'current_temp');
+                    if (is_object($geckoSpaCmd)) {
+                        $geckoSpaCmd->event($cmd['current_temp']);
+                    }
+
+                    $geckoSpaCmd = $eqLogic->getCmd(null, 'target_temperature');
+                    if (is_object($geckoSpaCmd)) {
+                        $geckoSpaCmd->event($cmd['target_temperature']);
+                    }
+                }
+            }
+        }
+
+    }
     //self::create_or_update_devices($updateItems);
     
   }

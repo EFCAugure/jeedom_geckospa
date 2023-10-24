@@ -17,7 +17,6 @@ try {
     }
 
     log::add('geckospa', 'debug', '*-----------------------------------------------------------------------------*');
-    log::add('geckospa', 'debug', '| received message from daemon -> ' . json_encode($result));
     if (isset($result['updateItems'])) {
         $jsonMefUpdateItems=str_replace(array('\\','"{','}"'), array('','{','}'),json_encode($result['updateItems']));
         

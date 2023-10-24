@@ -51,7 +51,7 @@ def read_socket():
 				execCmd(message)
 			elif message['action'] == 'synchronize':
 				logging.info('== action synchronize ==')
-				getDevicesList()
+				fetchStatesForallSpa()
 			else:
 				logging.info('== other action not manage yes : ' + message['action']  + ' ==')
 		except Exception as e:
