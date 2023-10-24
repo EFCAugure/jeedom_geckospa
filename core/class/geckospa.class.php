@@ -428,13 +428,13 @@ public static function sendToDaemon($params) {
                       	if ($cmd['state'] != '') {
                           	
                             if(is_bool($cmd['state'])) {
-                                //$geckoSpaCmd->event((boolean) $cmd['state']);
+                                $geckoSpaCmd->event((boolean) $cmd['state']);
                             } else {
-                                //$geckoSpaCmd->event($cmd['state']);
+                                $geckoSpaCmd->event($cmd['state']);
                             }
                         } else {
                           if ($geckoSpaCmd->getSubType() == 'binary') {
-                                //$geckoSpaCmd->event((boolean) false);
+                                $geckoSpaCmd->event((boolean) false);
                           }
                         }
                       
