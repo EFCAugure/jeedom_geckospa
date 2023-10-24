@@ -62,14 +62,12 @@ def listen():
 	jeedom_socket.open()
 
 	#_locator = GeckoLocator(_client_id)
-	spaDiscover()
+	#spaDiscover()
 	
 	try:
 		while 1:
-			#time.sleep(0.5)
-			time.sleep(5)
+			time.sleep(0.5)
 			read_socket()
-			fetchStatesForallSpa()
 
 	except KeyboardInterrupt:
 		shutdown()
@@ -177,8 +175,11 @@ def state(spaIdentifier):
 		cmdBlowers['state'] = facade.blowers[i].is_on
 		cmds.append(cmdBlowers)
 
-	for i in range(len(facade.reminders)):
-		print(f"aa {facade.reminders[i].type}")
+	"""
+	if facade.reminders is not None:
+		for i in range(len(facade.reminders)):
+			print(f"aa {facade.reminders[i].type}")
+	"""
 
 	for i in range(len(facade.sensors)):
 		cmdSensors = {}
@@ -201,6 +202,90 @@ def state(spaIdentifier):
 		del cmdSensors
 
 	facade.complete()
+	return cmds
+
+def getStateFromFacade(facade):
+	logging.debug("Get states from facade")
+	cmds=[]
+
+	#print(f"		- Watercare mode : {facade.water_care.mode} ;list: {facade.water_care.modes}")
+	cmdWaterCare={}
+	cmdWaterCare['name'] = 'waterCare'
+	cmdWaterCare['state'] = facade.water_care.mode
+	cmdWaterCare['stateString'] = facade.water_care.monitor
+	cmdWaterCare['stateList'] = facade.water_care.modes
+	#cmdWaterCare['on_watercar'] = facade.water_care.on_watercar
+	#cmdWaterCare['stateString']=GeckoConstants.WATERCARE_MODE_STRING.index({cmdWaterCare['state']})
+	cmds.append(cmdWaterCare)
+    
+
+	#print(f"		- Lights mode : {len(facade.lights)} |{facade.lights[0].is_on}")
+	logging.debug("	- get lights info")
+	for i in range(len(facade.lights)):
+		cmdLights = {}
+		cmdLights['name'] = "lights_" + str(i)
+		cmdLights['state'] = facade.lights[i].is_on
+		cmdLights['stateList'] = ['ON', 'OFF']
+		cmds.append(cmdLights)
+
+	#print(f"		- Heater : {facade.water_heater.min_temp} | {facade.water_heater.max_temp} | {facade.water_heater.current_temperature} | {facade.water_heater.temperature_unit} ")
+	logging.debug("	- get waterHeater info")
+	cmdHeater={}
+	cmdHeater['name'] = 'waterHeater'
+	cmdHeater['min_temp'] = facade.water_heater.min_temp
+	cmdHeater['max_temp'] = facade.water_heater.max_temp
+	cmdHeater['current_temp'] = facade.water_heater.current_temperature
+	cmdHeater['current_operation'] = facade.water_heater.current_operation
+	cmdHeater['target_temperature'] = facade.water_heater.target_temperature    
+	cmdHeater['unit'] = facade.water_heater.temperature_unit
+	cmds.append(cmdHeater)
+    
+    
+	#print(f"		- Pump : {len(facade.pumps)} | {facade.pumps[0].is_on} | {facade.pumps[0].mode} | {facade.pumps[0].modes} ")
+	logging.debug("	- get pumps info")
+	for i in range(len(facade.pumps)):
+		cmdPumps={}
+		cmdPumps['name'] = "pumps_" + str(i)
+		cmdPumps['state'] = facade.pumps[i].is_on
+		cmdPumps['mode'] = facade.pumps[i].mode
+		cmdPumps['stateList'] = facade.pumps[i].modes
+		cmds.append(cmdPumps)
+
+	logging.debug("	- get blowers info")
+	for i in range(len(facade.blowers)):
+		cmdBlowers = {}
+		cmdBlowers['name'] = "blower_" + str(i)
+		cmdBlowers['state'] = facade.blowers[i].is_on
+		cmds.append(cmdBlowers)
+
+	#logging.debug("	- get reminders info")
+	#for i in range(len(facade.reminders)):
+	#	print(f"aa {facade.reminders[i].type}")
+
+	logging.debug("	- get sensors info")
+	for i in range(len(facade.sensors)):
+		cmdSensors = {}
+		cmdSensors['name'] = "sensor_" + str(i)
+		cmdSensors['label'] = facade.sensors[i].accessor.tag        
+		cmdSensors['state'] = facade.sensors[i].state
+		cmdSensors['unit'] = facade.sensors[i].unit_of_measurement
+		cmds.append(cmdSensors)
+		#print(cmdSensors)
+
+		del cmdSensors
+        
+	logging.debug("	- get binary sensors info")
+	for i in range(len(facade.binary_sensors)):
+		cmdSensors = {}
+		cmdSensors['name'] = "sensorBinary_" + str(i)
+		cmdSensors['label'] = facade.binary_sensors[i].accessor.tag
+		cmdSensors['state'] = facade.binary_sensors[i].state
+		cmdSensors['unit'] = facade.binary_sensors[i].unit_of_measurement
+		cmds.append(cmdSensors)        
+
+		del cmdSensors
+
+	#facade.complete()
 	return cmds	
 
 def handler(signum=None, frame=None):
@@ -233,66 +318,41 @@ def shutdown():
 
 def execCmd(params):	
 	logging.debug(' * Execute command')
-	for i in range(len(_locator.spas)):
-		if params['spaIdentifier'] == _locator.spas[i].identifier_as_string:
-			logging.debug("	- spa %s trouvé", _locator.spas[i].identifier_as_string)
-			"""
-            with locator.spas[0].get_facade() as facade:
-                #print(facade.water_heater)
-                print(f"		- action : {sys.argv[3]} {sys.argv[4]} {sys.argv[5]}")  
-                if sys.argv[3] == 'lights':
-                    print(f"			- light old value : {facade.lights[int(sys.argv[4])].is_on}")
-                    if sys.argv[5] == '1':
-                        print(f"			- put on light {int(sys.argv[4])}")  
-                        facade.lights[int(sys.argv[4])].turn_on()
-                        time.sleep(3)
-                        print(f"			- light new value : {facade.lights[int(sys.argv[4])].is_on}")
-                    else:
-                        print(f"			- put off light {int(sys.argv[4])}")
-                        facade.lights[int(sys.argv[4])].turn_off()
-                        time.sleep(3)
-                        print(f"			- light new value : {facade.lights[int(sys.argv[4])].is_on}")
-                    elif sys.argv[3] == 'pumps':
-                        print(f"		- pump old value : {facade.pumps[int(sys.argv[4])].mode}")
-                        facade.pumps[int(sys.argv[4])].set_mode(sys.argv[5])        
-                        time.sleep(5)
-                        print(f"		- pump new value : {facade.pumps[int(sys.argv[4])].mode}")
-                    elif sys.argv[3] == 'target_temperature':
-                        print(f"		- target temperature old value : {facade.water_heater.target_temperature}")
-                        facade.water_heater.set_target_temperature(sys.argv[5])
-                        time.sleep(5)
-                        print(f"		- target temperature new value : {facade.water_heater.target_temperature}") 
-                    elif sys.argv[3] == 'water_care':
-                        print(f"		- water_care old value : {facade.water_care.monitor}")
-                        facade.water_care.set_mode(sys.argv[5])
-                        time.sleep(5)
-                        print(f"		- water_care new value : {facade.water_care.monitor}") 
-                    else:
-                        print(f" commande non traitee {sys.argv[3]}")
-			"""
-    
-    
-	"""
+
 	try:
+		if params['spaIdentifier'] != "":
+			spaResp={}
+			spaResp['name']=""
+			spaResp['id']=params['spaIdentifier']
 
-		if params['action'] != "":
-			logging.debug("Action : %s",params['action'])
+			spa=_locator.get_spa_from_identifier(params['spaIdentifier'])
 
-		if params['cmd'] != "":
-			logging.debug("cmd : %s",params['cmd'])
+			if(spa is not None):
+				facade=spa.get_facade()
+				if(facade is not None):	
+					if params['action'] != "":						
+						if params['cmd'] != "":
+							if params['cmd'] == "lights":
+								if params['value'] == 'ON':
+									facade.lights[int(params['ind'])].turn_on()
+								else:
+									facade.lights[int(params['ind'])].turn_off()
+							if params['cmd'] == "pumps":
+								facade.pumps[int(params['ind'])].set_mode(params['value'])  
+							if params['cmd'] == "water_care":
+								facade.water_care.set_mode(params['value'])
+							if params['cmd'] == "target_temperature":
+								facade.water_heater.set_target_temperature(params['value'])
 
-		if params['ind'] != "":
-			logging.debug("Indice : %s",params['ind'])
-
-		if params['value'] != "":
-			logging.debug("value : %s",params['value'])
-
-			
-
+							time.sleep(5)						
+							spaResp['cmds']=getStateFromFacade(facade)
+							logging.debug("Update items : %s", json.dumps(spaResp))
+							jeedom_com.send_change_immediate({'updateItems' : json.dumps(spaResp)})
+							
 	except requests.exceptions.HTTPError as err:
 		logging.error("Error when executing cmd to tahoma -> %s",err)
 		shutdown()
-	"""
+
 
 # ----------------------------------------------------------------------------
 
@@ -351,8 +411,6 @@ logging.info('Device: %s', _device)
 logging.info('Client Id : %s', _client_id)
 logging.info('*-------------------------------------------------------------------------*')
 
-_locator = GeckoLocator(_client_id)
-
 signal.signal(signal.SIGINT, handler)
 signal.signal(signal.SIGTERM, handler)
 
@@ -364,6 +422,11 @@ try:
 		shutdown()
 
 	jeedom_socket = jeedom_socket(port=_socket_port,address=_socket_host)
+
+	_locator = GeckoLocator(_client_id)
+	spaDiscover()
+	fetchStatesForallSpa()
+
 	listen()
 except Exception as e:
 	logging.error('Fatal error: %s', e)

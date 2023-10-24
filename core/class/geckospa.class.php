@@ -395,6 +395,12 @@ public static function sendToDaemon($params) {
     }
   }
 
+  public static function updateItems($updateItems) {
+    log::add(__CLASS__, 'debug', 'updateItems -> ' . $updateItems);
+    //self::create_or_update_devices($updateItems);
+    
+  }
+
   /*
   * Permet de définir les possibilités de personnalisation du widget (en cas d'utilisation de la fonction 'toHtml' par exemple)
   * Tableau multidimensionnel - exemple: array('custom' => true, 'custom::layout' => false)

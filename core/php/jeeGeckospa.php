@@ -17,9 +17,12 @@ try {
     }
 
     log::add('geckospa', 'debug', '*-----------------------------------------------------------------------------*');
-    if (isset($result['eventItem'])) {        
-        log::add('geckospa', 'debug', 'Message receive for evenItem -> ' . json_encode($result['eventItem']));
-        geckospa::updateItems($result['eventItem']);
+    log::add('geckospa', 'debug', '| received message from daemon -> ' . json_encode($result));
+    if (isset($result['updateItems'])) {
+        $jsonMefUpdateItems=str_replace(array('\\','"{','}"'), array('','{','}'),json_encode($result['updateItems']));
+        
+        log::add('geckospa', 'debug', 'Message receive for evenItem -> ' . $jsonMefUpdateItems);
+        geckospa::updateItems($jsonMefUpdateItems);
     } elseif (isset($result['devicesList'])) {
         $jsonMefListDevices=str_replace(array('\\','"{','}"'), array('','{','}'),json_encode($result['devicesList']));
 
