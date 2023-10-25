@@ -300,6 +300,7 @@ public static function sendToDaemon($params) {
           
           	//create cmd action 
           	if (array_key_exists('stateList',$cmd) && array_key_exists('name',$cmd)) {
+                $i=0;
               	foreach($cmd['stateList'] as $state) {
                     $cmdName=$cmd['name'].'_'.$state;
                     $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
@@ -313,8 +314,9 @@ public static function sendToDaemon($params) {
                         $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
                         
                     }
-                    $geckoSpaCmd->setConfiguration("stateList",json_encode($cmd['stateList']));
+                    $geckoSpaCmd->setConfiguration("indState",$i));
                     $geckoSpaCmd->save();
+                    $i++;
                 }
             }
           
@@ -674,18 +676,7 @@ class geckospaCmd extends cmd {
             $eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action' => 'execCmd', 'cmd' => 'target_temperature', 'ind' => 0, 'value'=> $value]);
             break;
          case stristr($logicalId,'waterCare'):
-          	$split=explode('_',$logicalId);
-           	log::add('geckospa', 'debug','   watercare	-> ' . $split[1]);
-               $geckoSpaCmd->setConfiguration("stateList",
-            $aStateList=json_decode( $geckoSpaCmd->getConfiguration("stateList",true));
-            $i=0;
-            foreach($aStateList as $state) {
-                if ($split[1] == $state) {
-                    log::add('geckospa', 'debug','   	-> ' .json_encode(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => 'waterCare', 'ind' => 0, 'value'=> $i]));
-                    break;      
-                }
-                $i++;
-            }
+           	log::add('geckospa', 'debug','   	-> ' .json_encode(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => 'waterCare', 'ind' => 0, 'value'=> $this->getConfiguration('indState')]));
             break;
          default:
             if (sizeof($aExecCmd) > 2 ) {
