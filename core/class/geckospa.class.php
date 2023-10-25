@@ -311,8 +311,10 @@ public static function sendToDaemon($params) {
                         $geckoSpaCmd->setName(self::buildCmdName($cmdName));
                         $geckoSpaCmd->setLogicalId($cmdName);
                         $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
-                        $geckoSpaCmd->save();
+                        
                     }
+                    $geckoSpaCmd->setConfiguration("stateList",json_encode($cmd['stateList']));
+                    $geckoSpaCmd->save();
                 }
             }
           
@@ -663,22 +665,41 @@ class geckospaCmd extends cmd {
     
     if ($this->type == 'action') {
       $aExecCmd=explode('_',$logicalId);
-      switch ($logicalId) {
-          case 'target_temperature_slider':
-              	$geckoSpaCmd = $eqlogic->getCmd(null, 'target_temperature');
-          		$value=$_options['slider'];
-          		$eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action' => 'execCmd', 'cmd' => 'target_temperature', 'ind' => 0, 'value'=> $value]);
-              	break;          
-          default:
-             	if (sizeof($aExecCmd) > 2 ) {
-                    $eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => $aExecCmd[0], 'ind' => $aExecCmd[1], 'value'=>$aExecCmd[2]]);
-                }  elseif (sizeof($aExecCmd) == 2 ) {
-                    $eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => $aExecCmd[0], 'ind' => 0, 'value'=>$aExecCmd[2]]);
-
+      
+      
+      switch (true){
+         case stristr($logicalId,'target_temperature_slider'):
+            $geckoSpaCmd = $eqlogic->getCmd(null, 'target_temperature');
+            $value=$_options['slider'];
+            $eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action' => 'execCmd', 'cmd' => 'target_temperature', 'ind' => 0, 'value'=> $value]);
+            break;
+         case stristr($logicalId,'waterCare'):
+          	$split=explode('_',$logicalId);
+           	log::add('geckospa', 'debug','   watercare	-> ' . $split[1]);
+               $geckoSpaCmd->setConfiguration("stateList",
+            $aStateList=json_decode( $geckoSpaCmd->getConfiguration("stateList",true));
+            $i=0;
+            foreach($aStateList as $state) {
+                if ($split[1] == $state) {
+                    log::add('geckospa', 'debug','   	-> ' .json_encode(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => 'waterCare', 'ind' => 0, 'value'=> $i]));
+                    break;      
                 }
-                break;
-      }
+                $i++;
+            }
+            break;
+         default:
+            if (sizeof($aExecCmd) > 2 ) {
+              log::add('geckospa', 'debug','   	-> ' .json_encode(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => $aExecCmd[0], 'ind' => $aExecCmd[1], 'value'=>$aExecCmd[2]]));
+              //$eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => $aExecCmd[0], 'ind' => $aExecCmd[1], 'value'=>$aExecCmd[2]]);
+            }  elseif (sizeof($aExecCmd) == 2 ) {
+              log::add('geckospa', 'debug','   	-> ' .json_encode(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => $aExecCmd[0], 'ind' => 0, 'value'=>$aExecCmd[2]]));
+              //$eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => $aExecCmd[0], 'ind' => 0, 'value'=>$aExecCmd[2]]);
+
+            }
+            break;
+      }      
     }
+    
     if ($this->type == 'info') {
         return;
     }
