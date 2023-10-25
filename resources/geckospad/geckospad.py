@@ -285,7 +285,7 @@ def getStateFromFacade(facade):
 
 		del cmdSensors
 
-	#facade.complete()
+	facade.complete()
 	return cmds	
 
 def handler(signum=None, frame=None):

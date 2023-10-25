@@ -485,15 +485,20 @@ public static function sendToDaemon($params) {
  /*
   * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
   */
+  /*
   public static function cron5() {
     self::synchronize();
   }
+  */
 
 
   /*
   * Fonction exécutée automatiquement toutes les 10 minutes par Jeedom
-  public static function cron10() {}
   */
+  public static function cron10() {
+    self::synchronize();
+  }
+  
 
   /*
   * Fonction exécutée automatiquement toutes les 15 minutes par Jeedom
