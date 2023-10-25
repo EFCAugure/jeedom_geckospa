@@ -332,6 +332,9 @@ def execCmd(params):
 				if(facade is not None):	
 					if params['action'] != "":						
 						if params['cmd'] != "":
+							logging.debug('   - action : ' + params['action'])
+							logging.debug('   - cmd : ' + params['cmd'])
+							logging.debug('   - value : ' + params['value'])																											
 							if params['cmd'] == "lights":
 								if params['value'] == 'ON':
 									facade.lights[int(params['ind'])].turn_on()
