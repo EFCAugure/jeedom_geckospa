@@ -346,6 +346,7 @@ def execCmd(params):
 								facade.pumps[int(params['ind'])].set_mode(params['value'])  
 							if params['cmd'] == "waterCare":
 								facade.water_care.set_mode(params['value'])
+								time.sleep(5)
 							if params['cmd'] == "target_temperature":
 								facade.water_heater.set_target_temperature(params['value'])
 

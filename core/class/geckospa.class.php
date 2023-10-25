@@ -257,7 +257,7 @@ public static function sendToDaemon($params) {
 
                     if ($cmd['stateList'] != '') {
                         if ($cmd['state'] != '') {
-                            $i=1;
+                            $i=0;
                             foreach($cmd['stateList'] as $stateString) {
                                 if ( $cmd['state'] == $i) {
                                     $geckoSpaCmd->event($stateString);
@@ -485,7 +485,7 @@ public static function sendToDaemon($params) {
                     if (is_object($geckoSpaCmd)) {
                         if ($cmd['stateList'] != '') {
                             if ($cmd['state'] != '') {
-                                $i=1;
+                                $i=0;
                                 foreach($cmd['stateList'] as $stateString) {
                                     if ( $cmd['state'] == $i) {
                                         $geckoSpaCmd->event($stateString);
@@ -696,7 +696,8 @@ class geckospaCmd extends cmd {
             $valueToSend = ['spaIdentifier' => $eqlogic->getLogicalId(), 'action' => 'execCmd', 'cmd' => 'target_temperature', 'ind' => 0, 'value'=> $value];
             break;
          case stristr($logicalId,'waterCare'):
-           	$valueToSend = ['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => 'waterCare', 'ind' => 0, 'value'=> $this->getConfiguration('indState')];
+           	//$valueToSend = ['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => 'waterCare', 'ind' => 0, 'value'=> $this->getConfiguration('indState')];
+          	$valueToSend = ['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => 'waterCare', 'ind' => 0, 'value'=> (explode('_',$logicalId))[1]];
             break;
          default:
             if (sizeof($aExecCmd) > 2 ) {
