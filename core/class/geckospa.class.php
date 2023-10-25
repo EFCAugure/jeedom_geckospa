@@ -486,11 +486,16 @@ public static function sendToDaemon($params) {
                     log::add(__CLASS__, 'debug', '			- update ' . $cmdName . ' with state ' . $cmd['state'] . ' and stateString -> '. $cmd['stateString']);
                     $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
                     if (is_object($geckoSpaCmd)) {
+                        log::add(__CLASS__, 'debug', 'aaaaaaaaaa');
                         if ($cmd['stateList'] != '') {
+                            log::add(__CLASS__, 'debug', 'bbbbbbbbbbbbb');
                             if ($cmd['state'] != '') {
+                                log::add(__CLASS__, 'debug', 'cccccccccc');
                                 $i=0;
                                 foreach($cmd['stateList'] as $stateString) {
+                                    log::add(__CLASS__, 'debug', 'ddddddddddddd');
                                     if ( $cmd['state'] == $i) {
+                                        log::add(__CLASS__, 'debug', 'eeeeeeeeeeeeee');
                                         $geckoSpaCmd->event($stateString);
                                         break;
                                     }
