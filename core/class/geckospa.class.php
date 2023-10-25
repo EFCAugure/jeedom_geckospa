@@ -270,6 +270,27 @@ public static function sendToDaemon($params) {
                 }  
               
             }
+
+            if (array_key_exists('mode',$cmd) && array_key_exists('name',$cmd)) {
+                $cmdName=$cmd['name'].'_mode';
+              	$geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
+                if (!(is_object($geckoSpaCmd))) {
+                    log::add(__CLASS__, 'debug', '                  -> Create cmd : ' . $cmdName);
+                    $geckoSpaCmd = new geckospaCmd();
+                    $geckoSpaCmd->setName(self::buildCmdName($cmdName));
+                    $geckoSpaCmd->setLogicalId($cmdName);
+                    $geckoSpaCmd->setEqLogic_id($eqLogic->getId());
+                    $geckoSpaCmd->setIsVisible(1); 
+                    $geckoSpaCmd->setType('info');
+                    $geckoSpaCmd->setSubType('string');
+                    $geckoSpaCmd->save();
+                }
+
+                //set or update value
+                if ($cmd['mode'] != '') {
+                    $geckoSpaCmd->event($cmd['mode']);
+                }
+            }
           
           
           	if ($cmd['name'] == 'waterHeater') {
@@ -495,9 +516,11 @@ public static function sendToDaemon($params) {
   /*
   * Fonction exécutée automatiquement toutes les 10 minutes par Jeedom
   */
+  /*
   public static function cron10() {
     self::synchronize();
   }
+  */
   
 
   /*
@@ -632,8 +655,8 @@ class geckospaCmd extends cmd {
           case 'target_temperature_slider':
               	$geckoSpaCmd = $eqlogic->getCmd(null, 'target_temperature');
           		$value=$_options['slider'];
-          		$eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action' => 'execCmd', 'cmd' => $aExecCmd[0], 'ind' => 0, 'value'=> $value]);
-              	break;
+          		$eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action' => 'execCmd', 'cmd' => 'target_temperature', 'ind' => 0, 'value'=> $value]);
+              	break;          
           default:
              	if (sizeof($aExecCmd) > 2 ) {
                     $eqlogic->sendToDaemon(['spaIdentifier' => $eqlogic->getLogicalId(), 'action'=>'execCmd','cmd' => $aExecCmd[0], 'ind' => $aExecCmd[1], 'value'=>$aExecCmd[2]]);

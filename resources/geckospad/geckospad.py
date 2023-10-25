@@ -342,7 +342,7 @@ def execCmd(params):
 									facade.lights[int(params['ind'])].turn_off()
 							if params['cmd'] == "pumps":
 								facade.pumps[int(params['ind'])].set_mode(params['value'])  
-							if params['cmd'] == "water_care":
+							if params['cmd'] == "waterCare":
 								facade.water_care.set_mode(params['value'])
 							if params['cmd'] == "target_temperature":
 								facade.water_heater.set_target_temperature(params['value'])
