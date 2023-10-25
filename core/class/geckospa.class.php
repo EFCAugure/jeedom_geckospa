@@ -492,7 +492,7 @@ public static function sendToDaemon($params) {
                             log::add(__CLASS__, 'debug', 'bbbbbbbbbbbbb');
                             if ($cmd['state'] != '') {
                                 log::add(__CLASS__, 'debug', 'cccccccccc');
-                                $i=1 ;
+                                $i=0 ;
                                 foreach($cmd['stateList'] as $stateString) {
                                     log::add(__CLASS__, 'debug', 'ddddddddddddd');
                                     if ( $cmd['state'] == $i) {
