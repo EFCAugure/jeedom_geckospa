@@ -453,8 +453,10 @@ public static function sendToDaemon($params) {
                       	if ($cmd['state'] != '') {
                           	
                             if(is_bool($cmd['state'])) {
+                                log::add(__CLASS__, 'debug', '			    -> update type boolean');
                                 $geckoSpaCmd->event((boolean) $cmd['state']);
                             } else {
+                                log::add(__CLASS__, 'debug', '			    -> update type string');
                                 $geckoSpaCmd->event($cmd['state']);
                             }
                         } else {
@@ -479,8 +481,9 @@ public static function sendToDaemon($params) {
                     }
                 }
 
-                if (array_key_exists('stateString',$cmd)) {
+                if (array_key_exists('stateString',$cmd)) {                    
                     $cmdName=$cmd['name'].'_stateString';
+                    log::add(__CLASS__, 'debug', '			- update ' . $cmdName . ' with state ' . $cmd['state'] . ' and stateString -> '. $cmd['stateString']);
                     $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
                     if (is_object($geckoSpaCmd)) {
                         if ($cmd['stateList'] != '') {
