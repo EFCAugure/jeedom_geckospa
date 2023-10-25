@@ -52,6 +52,13 @@ def read_socket():
 			elif message['action'] == 'synchronize':
 				logging.info('== action synchronize ==')
 				fetchStatesForallSpa()
+			elif message['action'] == 'synchronizeBySpaId':
+				spaResp={}
+				spaResp['name']=""
+				spaResp['id']=params['spaIdentifier']
+				spa=_locator.get_spa_from_identifier(message['spaId'])
+				spaResp['cmds']=getStateFromFacade(facade)
+				jeedom_com.send_change_immediate({'updateItems' : json.dumps(spaResp)})				
 			else:
 				logging.info('== other action not manage yes : ' + message['action']  + ' ==')
 		except Exception as e:

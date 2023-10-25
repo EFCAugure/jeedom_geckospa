@@ -550,11 +550,14 @@ public static function sendToDaemon($params) {
  /*
   * Fonction exécutée automatiquement toutes les 5 minutes par Jeedom
   */
-  /*
+
   public static function cron5() {
-    self::synchronize();
+    $eqLogics=eqLogic::byType(__CLASS__);
+    foreach ($eqLogics as $eqLogic) {
+        self::sendToDaemon(['action' => 'synchronizeBySpaId', 'spaId' => $eqLogic->getLogicalId()]);
+    }
   }
-  */
+
 
 
   /*
