@@ -492,11 +492,11 @@ public static function sendToDaemon($params) {
                             log::add(__CLASS__, 'debug', 'bbbbbbbbbbbbb');
                             if ($cmd['state'] != '') {
                                 log::add(__CLASS__, 'debug', 'cccccccccc');
-                                $i=0;
+                                $i=1 ;
                                 foreach($cmd['stateList'] as $stateString) {
                                     log::add(__CLASS__, 'debug', 'ddddddddddddd');
                                     if ( $cmd['state'] == $i) {
-                                        log::add(__CLASS__, 'debug', 'eeeeeeeeeeeeee');
+                                        log::add(__CLASS__, 'debug', 'eeeeeeeeeeeeee -> ' . $stateString );
                                         $geckoSpaCmd->event($stateString);
                                         break;
                                     }
