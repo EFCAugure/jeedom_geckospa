@@ -440,7 +440,8 @@ public static function sendToDaemon($params) {
         if (array_key_exists('cmds',$aSpas))
             foreach($aSpas['cmds'] as $cmd) {
                 if (array_key_exists('state',$cmd)) {
-                  	log::add(__CLASS__, 'debug', '		- cmd : ' . $cmd['name'] . '|'.$cmd['label'] . '|'.$cmd['state']);
+                  	log::add(__CLASS__, 'debug', '		- cmd : ' . $cmd['name'] . '|'.$cmd['label'] . '|'.$cmd['state'] . '('. strlen($cmd['state']).')');
+                      log::add(__CLASS__, 'debug', '		- json cmd : ' . json_encode($cmd));
                     $cmdName=$cmd['name'].'_state';
                     if (array_key_exists('label',$cmd)) {
                         $cmdName=$cmd['label'];
