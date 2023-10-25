@@ -463,6 +463,18 @@ public static function sendToDaemon($params) {
                     }
                 }
 
+                if (array_key_exists('mode',$cmd)) {
+                    $cmdName=$cmd['name'].'_mode';
+                    log::add(__CLASS__, 'debug', '	 - search for cmd : ' . $cmdName);
+                    $geckoSpaCmd = $eqLogic->getCmd(null, $cmdName);
+                    if (is_object($geckoSpaCmd)) {
+                            log::add(__CLASS__, 'debug', '			- update ' . $cmdName . ' by ' . $cmd['mode']);
+                            if ($cmd['mode'] != '') {
+                                $geckoSpaCmd->event($cmd['mode']);
+                            }                                                    
+                    }
+                }
+
                 if ($cmd['name'] == 'waterHeater') {
                     $geckoSpaCmd = $eqLogic->getCmd(null, 'current_temp');
                     if (is_object($geckoSpaCmd)) {
