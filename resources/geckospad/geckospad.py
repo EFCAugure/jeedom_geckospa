@@ -334,13 +334,15 @@ def execCmd(params):
 						if params['cmd'] != "":
 							logging.debug('   - action : ' + params['action'])
 							logging.debug('   - cmd : ' + params['cmd'])
-							logging.debug('   - value : ' + params['value'])																											
+
 							if params['cmd'] == "lights":
+								logging.debug('   - value : ' + params['value'])																											
 								if params['value'] == 'ON':
 									facade.lights[int(params['ind'])].turn_on()
 								else:
 									facade.lights[int(params['ind'])].turn_off()
 							if params['cmd'] == "pumps":
+								logging.debug('   - value : ' + params['value'])
 								facade.pumps[int(params['ind'])].set_mode(params['value'])  
 							if params['cmd'] == "waterCare":
 								facade.water_care.set_mode(params['value'])
