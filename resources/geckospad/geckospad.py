@@ -57,6 +57,7 @@ def read_socket():
 				spaResp['name']=""
 				spaResp['id']=message['spaId']
 				spa=_locator.get_spa_from_identifier(message['spaId'])
+				facade=spa.get_facade()
 				spaResp['cmds']=getStateFromFacade(facade)
 				jeedom_com.send_change_immediate({'updateItems' : json.dumps(spaResp)})				
 			else:
