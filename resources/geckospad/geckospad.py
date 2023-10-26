@@ -27,6 +27,7 @@ from os.path import join
 import json
 import argparse
 import time
+import uuid
 
 from geckolib import GeckoLocator
 from geckolib import GeckoConstants
@@ -56,10 +57,12 @@ def read_socket():
 				spaResp={}
 				spaResp['name']=""
 				spaResp['id']=message['spaId']
-				spa=_locator.get_spa_from_identifier(message['spaId'])
+				spa=_locator.get_spa_from_identifier(message['spaId'])                
 				facade=spa.get_facade()
 				spaResp['cmds']=getStateFromFacade(facade)
-				jeedom_com.send_change_immediate({'updateItems' : json.dumps(spaResp)})				
+				jeedom_com.send_change_immediate({'updateItems' : json.dumps(spaResp)})                
+				facade.complete()
+				_locator.complete()
 			else:
 				logging.info('== other action not manage yes : ' + message['action']  + ' ==')
 		except Exception as e:
@@ -362,7 +365,8 @@ def execCmd(params):
 							spaResp['cmds']=getStateFromFacade(facade)
 							logging.debug("Update items : %s", json.dumps(spaResp))
 							jeedom_com.send_change_immediate({'updateItems' : json.dumps(spaResp)})
-							
+
+			_locator.complete()						
 	except requests.exceptions.HTTPError as err:
 		logging.error("Error when executing cmd to tahoma -> %s",err)
 		shutdown()
@@ -440,7 +444,7 @@ try:
 	_locator = GeckoLocator(_client_id)
 	spaDiscover()
 	fetchStatesForallSpa()
-
+	_locator.complete()
 	listen()
 except Exception as e:
 	logging.error('Fatal error: %s', e)
