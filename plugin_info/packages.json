@@ -4,8 +4,7 @@
   "apt": {
   },
   "pip3": {
-    "pyserial" : {"reinstall" : true},
-    "requests" : {"reinstall" : true}
+    "geckolib" : {"reinstall" : true}
   },
   "npm": {
   },
