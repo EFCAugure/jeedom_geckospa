@@ -138,25 +138,12 @@ def shutdown():
 	sys.stdout.flush()
 	os._exit(0)
 # ----------------------------------------------------------------------------
-
-_log_level = "error"
-_socket_port = 55009
-_socket_host = 'localhost'
-_device = 'auto'
-_pidfile = '/tmp/geckospapid.pid'
-_apikey = ''
-_callback = ''
-_cycle = 0.3
-
-_client_id=''
-
 parser = argparse.ArgumentParser(
 description='Desmond Daemon for Jeedom plugin')
 parser.add_argument("--device", help="Device", type=str)
 parser.add_argument("--loglevel", help="Log Level for the daemon", type=str)
 parser.add_argument("--callback", help="Callback", type=str)
 parser.add_argument("--apikey", help="Apikey", type=str)
-parser.add_argument("--cycle", help="Cycle to send event", type=str)
 parser.add_argument("--pid", help="Pid file", type=str)
 parser.add_argument("--socketport", help="Daemon port", type=str)
 parser.add_argument("--clientId", help="Client Id", type=str)

@@ -23,4 +23,8 @@ class Config(object):
 
     @property
     def pid_filename(self):
-        return self._kwargs.get('pid', '/tmp/worxLandroidSd.pid')
+        return self._kwargs.get('pid', '/tmp/geckospapid.pid')
+
+    @property
+    def cycle(self):
+        return self._kwargs.get('cycle', 1)
