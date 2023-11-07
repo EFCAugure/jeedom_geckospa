@@ -54,7 +54,7 @@ class GeckoSpa:
 			return
 
 		self._loop = asyncio.get_running_loop()
-		_LOGGER.info('   before GeckoSpaMan')
+		_LOGGER.info('   before GeckoSpaMan -> '+ self._config.clientId)
 		async with GeckoSpaMan(self._config.clientId, spa_address=SPA_ADDRESS) as spaman:
 			_LOGGER.info("Looking for spas on your network ...")
 
