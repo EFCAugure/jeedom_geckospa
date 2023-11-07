@@ -29,7 +29,13 @@ from jeedom.utils import Utils
 from jeedom.aio_connector import Listener, Publisher
 from geckolib import GeckoAsyncSpaMan, GeckoSpaEvent
 
-class GeckoSpa(GeckoAsyncSpaMan):
+class GeckoSpaMan(GeckoAsyncSpaMan):
+	async def handle_event(self, event: GeckoSpaEvent, **kwargs) -> None:
+		# Uncomment this line to see events generated
+		# print(f"{event}: {kwargs}")
+		pass
+
+class GeckoSpa:	
 	def __init__(self, config: Config) -> None:
 		self._config = config
 		self._jeedom_publisher = None
@@ -38,19 +44,14 @@ class GeckoSpa(GeckoAsyncSpaMan):
 		self._auto_reconnect_task = None
 		self._loop = None
 		self._logger = logging.getLogger(__name__)
-
-	async def handle_event(self, event: GeckoSpaEvent, **kwargs) -> None:
-		# Uncomment this line to see events generated
-		# print(f"{event}: {kwargs}")
-		pass
-	
+		
 	async def main(self):
 		self._jeedom_publisher = Publisher(self._config.callback_url, self._config.api_key, self._config.cycle)
 		if not await self._jeedom_publisher.test_callback():
 			return
 
 		self._loop = asyncio.get_running_loop()	
-		async with SampleSpaMan(CLIENT_ID, spa_address=SPA_ADDRESS) as spaman:
+		async with GeckoSpaMan(CLIENT_ID, spa_address=SPA_ADDRESS) as spaman:
 			print("Looking for spas on your network ...")
 
 			# Wait for descriptors to be available
