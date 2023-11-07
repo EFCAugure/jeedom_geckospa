@@ -48,23 +48,25 @@ class GeckoSpa:
 		self._logger = logging.getLogger(__name__)
 
 	async def main(self):
+		_LOGGER.info('   main')
 		self._jeedom_publisher = Publisher(self._config.callback_url, self._config.api_key, self._config.cycle)
 		if not await self._jeedom_publisher.test_callback():
 			return
 
-		self._loop = asyncio.get_running_loop()	
+		self._loop = asyncio.get_running_loop()
+		_LOGGER.info('   before GeckoSpaMan')
 		async with GeckoSpaMan(self._config.clientId, spa_address=SPA_ADDRESS) as spaman:
-			print("Looking for spas on your network ...")
+			_LOGGER.info("Looking for spas on your network ...")
 
 			# Wait for descriptors to be available
 			await spaman.wait_for_descriptors()
 
 			if len(spaman.spa_descriptors) == 0:
-				print("**** There were no spas found on your network.")
+				_LOGGER.info("**** There were no spas found on your network.")
 				return
 
 			spa_descriptor = spaman.spa_descriptors[0]
-			print(f"Connecting to {spa_descriptor.name} at {spa_descriptor.ipaddress} ...")
+			_LOGGER.info("Connecting to " + spa_descriptor.name +" at " + spa_descriptor.ipaddress +" ...")
 			await spaman.async_set_spa_info(
 				spa_descriptor.ipaddress,
 				spa_descriptor.identifier_as_string,
@@ -74,14 +76,14 @@ class GeckoSpa:
 			# Wait for the facade to be ready
 			await spaman.wait_for_facade()
 
-			print(spaman.facade.water_heater)
+			_LOGGER.info(spaman.facade.water_heater)
 
-			print("Turning pump 1 on")
+			_LOGGER.info("Turning pump 1 on")
 			#await spaman.facade.pumps[0].async_set_mode("HI")
 
 			#await asyncio.sleep(5)
 
-			print("Turning pump 1 off")
+			_LOGGER.info("Turning pump 1 off")
 			#await spaman.facade.pumps[0].async_set_mode("OFF")
 
 			#await asyncio.sleep(5)
