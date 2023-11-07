@@ -126,17 +126,17 @@ class GeckoSpa(GeckoAsyncSpaMan):
 		payload = json.loads(json.dumps(data, default=lambda d: self.__encoder(d)))
 		await self._jeedom_publisher.add_change(key, payload)
 
-	def shutdown():
-		_LOGGER.info("Shuting down")
-		try:
-			_LOGGER.debug("Removing PID file %s", config.pid_filename)
-			os.remove(config.pid_filename)
-		except:
-			pass
+def shutdown():
+	_LOGGER.info("Shuting down")
+	try:
+		_LOGGER.debug("Removing PID file %s", config.pid_filename)
+		os.remove(config.pid_filename)
+	except:
+		pass
 
-		_LOGGER.debug("Exit 0")
-		sys.stdout.flush()
-		os._exit(0)
+	_LOGGER.debug("Exit 0")
+	sys.stdout.flush()
+	os._exit(0)
 # ----------------------------------------------------------------------------
 
 _log_level = "error"
