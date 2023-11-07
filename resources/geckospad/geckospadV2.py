@@ -96,10 +96,10 @@ class GeckoSpa(GeckoAsyncSpaMan):
 		self._listen_task.cancel()
 		self._send_task.cancel()
 
-	def _on_message(self, name, device: DeviceHandler):
-		tmpDevice = self._get_device_to_send(device)
-		_LOGGER.debug("on message %s, %s", name, str(tmpDevice))
-		self._loop.create_task(self.__format_and_send('update::' + device.uuid, tmpDevice))
+	def _on_message(self, name):
+		#tmpDevice = self._get_device_to_send(device)
+		_LOGGER.debug("_on_message")
+		#self._loop.create_task(self.__format_and_send('update::' + device.uuid, tmpDevice))
 
 	async def _on_socket_message(self, message):
 		if message['apikey'] != self._config.api_key:
@@ -109,7 +109,8 @@ class GeckoSpa(GeckoAsyncSpaMan):
 			if message['action'] == 'stop':
 				self.close()
 			elif message['action'] == 'synchronize':
-				self._worxcloud.fetch()
+				_LOGGER.info('_on_socket_message -> synchronize')	
+				#self._worxcloud.fetch()
 				#await self._send_devices()
 			elif message['action'] == 'get_activity_logs':
 				#device = self._worxcloud.get_device_by_serial_number(message['serial_number'])
