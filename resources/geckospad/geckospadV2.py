@@ -29,6 +29,8 @@ from jeedom.utils import Utils
 from jeedom.aio_connector import Listener, Publisher
 from geckolib import GeckoAsyncSpaMan, GeckoSpaEvent
 
+SPA_ADDRESS = None
+
 class GeckoSpaMan(GeckoAsyncSpaMan):
 	async def handle_event(self, event: GeckoSpaEvent, **kwargs) -> None:
 		# Uncomment this line to see events generated
