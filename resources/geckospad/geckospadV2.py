@@ -114,6 +114,7 @@ class GeckoSpa(GeckoAsyncSpaMan):
 			elif message['action'] == 'get_activity_logs':
 				#device = self._worxcloud.get_device_by_serial_number(message['serial_number'])
 				#await self.__format_and_send('activity_logs::' + device.uuid, payload)
+				_LOGGER.info('_on_socket_message -> _on_socket_message')				
 			else:
 				_LOGGER.info('else _on_socket_message')
 				#await self._executeAction(message)
