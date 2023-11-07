@@ -44,14 +44,14 @@ class GeckoSpa:
 		self._auto_reconnect_task = None
 		self._loop = None
 		self._logger = logging.getLogger(__name__)
-		
+
 	async def main(self):
 		self._jeedom_publisher = Publisher(self._config.callback_url, self._config.api_key, self._config.cycle)
 		if not await self._jeedom_publisher.test_callback():
 			return
 
 		self._loop = asyncio.get_running_loop()	
-		async with GeckoSpaMan(CLIENT_ID, spa_address=SPA_ADDRESS) as spaman:
+		async with GeckoSpaMan(self._config.clientId, spa_address=SPA_ADDRESS) as spaman:
 			print("Looking for spas on your network ...")
 
 			# Wait for descriptors to be available

@@ -28,3 +28,7 @@ class Config(object):
     @property
     def cycle(self):
         return self._kwargs.get('cycle', 1)
+
+    @property
+    def clientId(self):
+        return self._kwargs.get('clientId','')
