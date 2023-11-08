@@ -33,7 +33,7 @@ class geckospa extends eqLogic {
         if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependency')) {
             $return['state'] = 'in_progress';
         } else {
-            if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec "python3\-dev|python3\-venv"') < 2) {
+            if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec "python3\-dev|python3.9\-venv"') < 2) {
                 $return['state'] = 'nok';
             } elseif (exec(system::getCmdSudo() . self::PYTHON_PATH . ' -m pip list | grep -Ewc "wheel|aiohttp"') < 2) {
                 $return['state'] = 'nok';
