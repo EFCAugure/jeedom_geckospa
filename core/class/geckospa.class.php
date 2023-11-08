@@ -19,6 +19,28 @@
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class geckospa extends eqLogic {
+    public static function dependancy_install() {
+        log::remove(__CLASS__ . '_update');
+        return array('script' => __DIR__ . '/../../resources/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependency', 'log' => log::getPathToLog(__CLASS__ . '_update'));
+    }
+
+    public static function dependancy_info() {
+        $return = array();
+        $return['log'] = log::getPathToLog(__CLASS__ . '_update');
+        $return['progress_file'] = jeedom::getTmpFolder(__CLASS__) . '/dependency';
+        if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependency')) {
+            $return['state'] = 'in_progress';
+        } else {
+            if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec "python3\-dev|python3\-venv"') < 2) {
+                $return['state'] = 'nok';
+            } elseif (exec(system::getCmdSudo() . self::PYTHON_PATH . ' -m pip list | grep -Ewc "wheel|aiohttp"') < 4) {
+                $return['state'] = 'nok';
+            } else {
+                $return['state'] = 'ok';
+            }
+        }
+        return $return;
+    }
 
     public static function getcmdName($name) {
       	return str_replace(array('lights','pumps','waterCare','sensorBinary','sensor','waterHeater'),array('Lumière','Pompe','Traitement de l\'eau','Capteur binaire','Capteur','Chauffage'),$name);
@@ -43,22 +65,8 @@ class geckospa extends eqLogic {
         }
     }
     $return['launchable'] = 'ok';
-    //$user = config::byKey('user', __CLASS__); // exemple si votre démon à besoin de la config user,
-    //$pswd = config::byKey('password', __CLASS__); // password,
-    // $clientId = config::byKey('clientId', __CLASS__); // et clientId
     $portDaemon=config::byKey('daemonPort', __CLASS__);
-    /*
-    if ($user == '') {
-        $return['launchable'] = 'nok';
-        $return['launchable_message'] = __('Le nom d\'utilisateur n\'est pas configuré', __FILE__);
-    } elseif ($pswd == '') {
-        $return['launchable'] = 'nok';
-        $return['launchable_message'] = __('Le mot de passe n\'est pas configuré', __FILE__);
-     } elseif ($clientId == '') {
-         $return['launchable'] = 'nok';
-         $return['launchable_message'] = __('La clé d\'application n\'est pas configurée', __FILE__);
-    }
-    */
+
     return $return;
 }
 
@@ -71,7 +79,7 @@ public static function deamon_start() {
   }
 
   $path = realpath(dirname(__FILE__) . '/../../resources/geckospad'); 
-  $cmd = 'python3 ' . $path . '/geckospadV2.py'; // nom du démon
+  $cmd = '/usr/bin/python3 ' . $path . '/geckospadV2.py'; // nom du démon
   $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
   $cmd .= ' --socketport ' . config::byKey('socketport', __CLASS__, '55009'); // port du daemon
   $cmd .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/geckospa/core/php/jeeGeckospa.php'; // chemin de la callback url 
