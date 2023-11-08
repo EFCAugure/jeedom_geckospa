@@ -9,7 +9,7 @@
 	"require" : "4.2.0",
 	"category" : "devicecommunication",
 	"hasDependency" : true,
-	"hasOwnDeamon" : true,
+	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
 	"changelog" : "https://github.com/chris94440/jeedom_tahomalocalapi/blob/master/docs/fr_FR/changelog.md",
 	"documentation" : "https://github.com/chris94440/jeedom_tahomalocalapi/blob/master/docs/fr_FR/index.md",

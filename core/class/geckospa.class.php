@@ -19,6 +19,8 @@
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class geckospa extends eqLogic {
+    const PYTHON_PATH = __DIR__ . '/../../resources/venv/bin/python3';
+    
     public static function dependancy_install() {
         log::remove(__CLASS__ . '_update');
         return array('script' => __DIR__ . '/../../resources/install_#stype#.sh ' . jeedom::getTmpFolder(__CLASS__) . '/dependency', 'log' => log::getPathToLog(__CLASS__ . '_update'));
