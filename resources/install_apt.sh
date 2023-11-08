@@ -34,7 +34,7 @@ echo 20 > ${PROGRESS_FILE}
 log "*****************************"
 log "Install modules using apt-get"
 log "*****************************"
-apt-get install -y python3 python3-requests python3-pip python3-dev python3-venv | log
+apt-get install -y python3 python3-requests python3-pip python3-dev python3.9-venv | log
 echo 50 > ${PROGRESS_FILE}
 
 log "*************************************"
@@ -47,9 +47,9 @@ log "Done"
 log "*************************************"
 log "Install the required python libraries"
 log "*************************************"
-$VENV_DIR/bin/python3 -m pip install --upgrade pip wheel | log
+$VENV_DIR/bin/python3.9 -m pip install --upgrade pip wheel | log
 echo 70 > ${PROGRESS_FILE}
-$VENV_DIR/bin/python3 -m pip install -r requirements.txt | log
+$VENV_DIR/bin/python3.9 -m pip install -r requirements.txt | log
 
 echo 100 > ${PROGRESS_FILE}
 log "***************************"
