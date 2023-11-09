@@ -10,7 +10,7 @@ else
   exit
 fi
 TMP_FILE=/tmp/jeedom/geckospa/post-install_geckospa_bashrc
-export PYENV_ROOT="$(realpath ressources)/_pyenv"
+export PYENV_ROOT="$(realpath resources)/_pyenv"
 PYENV_VERSION="3.9.16"
 
 touch "$PROGRESS_FILE"
@@ -54,7 +54,7 @@ echo "********************************************************"
 date
 command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
-cd ressources/geckospad
+cd resources/geckospad
 chown -R www-data:www-data "$PYENV_ROOT"
 sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv local "$PYENV_VERSION"
 sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv exec pip install --upgrade pip setuptools
