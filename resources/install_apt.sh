@@ -63,6 +63,8 @@ sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv exec pip install --upgrade requests 
 chown -R www-data:www-data "$PYENV_ROOT"
 sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv exec pip install aiohttp
 chown -R www-data:www-data "$PYENV_ROOT"
+sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv exec pip install geckospa
+chown -R www-data:www-data "$PYENV_ROOT"
 echo 100 > "$PROGRESS_FILE"
 rm "$PROGRESS_FILE"
 rm "$TMP_FILE"

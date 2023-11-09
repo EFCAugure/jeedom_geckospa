@@ -19,7 +19,7 @@
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 class geckospa extends eqLogic {
-    const PYTHON_PATH = __DIR__ . '/../../resources/venv/bin/python3';
+    //const PYTHON_PATH = __DIR__ . '/../../resources/venv/bin/python3';
     
     public static function dependancy_install() {
         log::remove(__CLASS__ . '_update');
@@ -67,16 +67,16 @@ class geckospa extends eqLogic {
             $return['state'] = 'ok';
         } else {
             shell_exec(system::getCmdSudo() . 'rm -rf ' . $pid_file . ' 2>&1 > /dev/null');
-        }
+        }    
     }
     $return['launchable'] = 'ok';
-    $portDaemon=config::byKey('daemonPort', __CLASS__);
-
+    $portDaemon=config::byKey('socketport', __CLASS__);
     return $return;
 }
 
 /* Start daemon */
 public static function deamon_start() {
+  log::add(__CLASS__, 'info', __FUNCTION__);
   self::deamon_stop();
   $deamon_info = self::deamon_info();
   if ($deamon_info['launchable'] != 'ok') {
@@ -101,15 +101,15 @@ public static function deamon_start() {
   $request .= ' --socketport ' . config::byKey('socketport', __CLASS__, '55009'); // port du daemon
   $request .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/geckospa/core/php/jeeGeckospa.php'; // chemin de la callback url 
   $request .= ' --apikey ' . jeedom::getApiKey(__CLASS__); // l'apikey pour authentifier les échanges suivants
-  $request .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/geckospadV2.pid'; // et on précise le chemin vers le pid file (ne pas modifier)
+  $request .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/geckospad.pid'; // et on précise le chemin vers le pid file (ne pas modifier)
   $request .= ' --clientId "' . trim(str_replace('"', '\"', self::guidv4())) . '"'; // IP box somfy
 
-  $geckospa_path = realpath(dirname(__FILE__) . '/../../resources/geckospad/geckospadV2.py');
+  $geckospa_path = realpath(dirname(__FILE__) . '/../../resources/geckospad/');
   $pyenv_path = realpath(dirname(__FILE__) . '/../../resources/_pyenv');
   $cmd = 'export PYENV_ROOT="' . $pyenv_path . '"; command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"; eval "$(pyenv init -)"; ';
   $cmd .= 'cd ' . $geckospa_path . '; ';
   $cmd .= 'nice -n 19 python3 geckospadV2.py' . $request;
-  log::add('mymodbus', 'info', 'Lancement du démon geckospa : ' . $cmd);     
+  log::add(__CLASS__, 'info', 'Lancement du démon geckospa : ' . $cmd);     
   $result = exec($cmd . ' >> ' . log::getPathToLog('geckospa_daemon') . ' 2>&1 &');
 
   /*
@@ -163,7 +163,7 @@ public static function deamon_stop() {
       $pid = intval(trim(file_get_contents($pid_file)));
       system::kill($pid);
   }
-  system::kill('geckospad.py'); // nom du démon à modifier
+  system::kill('geckospadV2.py'); // nom du démon à modifier
   sleep(1);
 }
 
