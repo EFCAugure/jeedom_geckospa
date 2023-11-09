@@ -80,6 +80,7 @@ public static function deamon_start() {
       throw new Exception(__('Veuillez vérifier la configuration', __FILE__));
   }
 
+  /*
   $path = realpath(dirname(__FILE__) . '/../../resources/geckospad'); 
   $cmd = '/usr/bin/python3 ' . $path . '/geckospadV2.py'; // nom du démon
   $cmd .= ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
@@ -91,6 +92,39 @@ public static function deamon_start() {
   
   log::add(__CLASS__, 'info', 'Lancement démon');
   $result = exec($cmd . ' >> ' . log::getPathToLog('geckospa_daemon') . ' 2>&1 &'); 
+  */
+  
+  $request = ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
+  $request .= ' --socketport ' . config::byKey('socketport', __CLASS__, '55009'); // port du daemon
+  $request .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/geckospa/core/php/jeeGeckospa.php'; // chemin de la callback url 
+  $request .= ' --apikey ' . jeedom::getApiKey(__CLASS__); // l'apikey pour authentifier les échanges suivants
+  $request .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/geckospad.pid'; // et on précise le chemin vers le pid file (ne pas modifier)
+  $request .= ' --clientId "' . trim(str_replace('"', '\"', self::guidv4())) . '"'; // IP box somfy
+
+  $geckospa_path = realpath(dirname(__FILE__) . '/../../ressources/geckospad/geckospadV2.py');
+  $pyenv_path = realpath(dirname(__FILE__) . '/../../ressources/_pyenv');
+  $cmd = 'export PYENV_ROOT="' . $pyenv_path . '"; command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"; eval "$(pyenv init -)"; ';
+  $cmd .= 'cd ' . $geckospa_path . '; ';
+  $cmd .= 'nice -n 19 python3 geckospadV2.py' . $request;
+  log::add('mymodbus', 'info', 'Lancement du démon geckospa : ' . $cmd);     
+  $result = exec($cmd . ' >> ' . log::getPathToLog('geckospa_daemon') . ' 2>&1 &');
+
+  /*
+  $request = ' --socketport ' . $socketPort . ' --loglevel ' . $daemonLoglevel . ' --apikey ' . $daemonApikey . ' --callback ' . $daemonCallback . ' --json ' . $jsonEqConfig;
+    
+    $mymodbus_path = realpath(dirname(__FILE__) . '/../../ressources/mymodbusd');
+    $pyenv_path = realpath(dirname(__FILE__) . '/../../ressources/_pyenv');
+    $cmd = 'export PYENV_ROOT="' . $pyenv_path . '"; command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"; eval "$(pyenv init -)"; ';
+    $cmd .= 'cd ' . $mymodbus_path . '; ';
+    $cmd .= 'nice -n 19 python3 mymodbusd.py' . $request;
+    log::add('mymodbus', 'info', 'Lancement du démon mymodbus : ' . $cmd);     
+    $result = exec($cmd . ' >> ' . log::getPathToLog('mymodbus') . ' 2>&1 &');
+    
+    if (strpos(strtolower($result), 'error') !== false || strpos(strtolower($result), 'traceback') !== false) {
+      log::add('mymodbus', 'error', $result);
+      return false;
+    }
+  */
   $i = 0;
   while ($i < 20) {
       $deamon_info = self::deamon_info();

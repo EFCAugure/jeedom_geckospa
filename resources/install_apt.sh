@@ -1,58 +1,72 @@
+# post-install script for Jeedom plugin geckospa
 PROGRESS_FILE=/tmp/jeedom/geckospa/dependency
-if [ ! -z $1 ]; then
-	PROGRESS_FILE=$1
+if [ -n "$1" ]; then
+	PROGRESS_FILE="$1"
 fi
+if [ -d ../../plugins/geckospa ]; then
+  cd ../../plugins/geckospa
+else
+  echo "Ce script doit être appelé depuis .../core/data"
+  exit
+fi
+TMP_FILE=/tmp/jeedom/geckospa/post-install_geckospa_bashrc
+export PYENV_ROOT="$(realpath ressources)/_pyenv"
+PYENV_VERSION="3.9.16"
 
-BASE_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-VENV_DIR=$BASE_DIR/venv
-
-function log(){
-	if [ -n "$1" ]
-	then
-		echo "$(date +'[%F %T]') $1";
-	else
-		while read IN               # If it is output from command then loop it
-		do
-			echo "$(date +'[%F %T]') $IN";
-		done
-	fi
-}
-
-cd $BASE_DIR
-
-touch ${PROGRESS_FILE}
-echo 0 > ${PROGRESS_FILE}
-log "*************************************"
-log "*   Launch install of dependencies  *"
-log "*************************************"
-echo 5 > ${PROGRESS_FILE}
-apt-get clean | log
-echo 10 > ${PROGRESS_FILE}
-apt-get update | log
-echo 20 > ${PROGRESS_FILE}
-
-log "*****************************"
-log "Install modules using apt-get"
-log "*****************************"
-apt-get install -y python3 python3-requests python3-pip python3-dev python3.9-venv | log
-echo 50 > ${PROGRESS_FILE}
-
-log "*************************************"
-log "Creating python 3 virtual environment"
-log "*************************************"
-python3 -m venv $VENV_DIR | log
-echo 60 > ${PROGRESS_FILE}
-log "Done"
-
-log "*************************************"
-log "Install the required python libraries"
-log "*************************************"
-$VENV_DIR/bin/python3.9 -m pip install --upgrade pip wheel | log
-echo 70 > ${PROGRESS_FILE}
-$VENV_DIR/bin/python3.9 -m pip install -r requirements.txt | log
-
-echo 100 > ${PROGRESS_FILE}
-log "***************************"
-log "*      Install ended      *"
-log "***************************"
-rm ${PROGRESS_FILE}
+touch "$PROGRESS_FILE"
+echo 0 > "$PROGRESS_FILE"
+echo "********************************************************"
+echo "*         Installation de pyenv          *"
+echo "********************************************************"
+date
+if [ ! -d "$PYENV_ROOT" ]; then
+  sudo -E -u www-data curl https://pyenv.run | bash
+  echo 20 > "$PROGRESS_FILE"
+fi
+echo "****  Configuration de pyenv..."
+grep -vi pyenv ~/.bashrc > "$TMP_FILE"
+cat "$TMP_FILE" > ~/.bashrc
+cat >> ~/.bashrc<< EOF
+export PYENV_ROOT="$PYENV_ROOT"
+command -v pyenv >/dev/null || export PATH="\$PYENV_ROOT/bin:\$PATH"
+eval "\$(pyenv init -)"
+EOF
+sudo -E -u www-data grep -vi pyenv ~www-data/.bashrc > "$TMP_FILE"
+cat "$TMP_FILE" > ~www-data/.bashrc
+sudo -E -u www-data cat >> ~www-data/.bashrc<< EOF
+export PYENV_ROOT="$PYENV_ROOT"
+command -v pyenv >/dev/null || export PATH="\$PYENV_ROOT/bin:\$PATH"
+eval "\$(pyenv init -)"
+EOF
+echo 30 > "$PROGRESS_FILE"
+if [ ! -d "$PYENV_ROOT/versions/$PYENV_VERSION" ]; then
+  echo "********************************************************"
+  echo "*  Installation de python $PYENV_VERSION (dure longtemps)  *"
+  echo "********************************************************"
+  date
+  chown -R www-data:www-data "$PYENV_ROOT"
+  sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv install "$PYENV_VERSION"
+fi
+echo 95 > "$PROGRESS_FILE"
+echo "********************************************************"
+echo "*    Configuration de pyenv avec python $PYENV_VERSION     *"
+echo "********************************************************"
+date
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+cd ressources/geckospad
+chown -R www-data:www-data "$PYENV_ROOT"
+sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv local "$PYENV_VERSION"
+sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv exec pip install --upgrade pip setuptools
+chown -R www-data:www-data "$PYENV_ROOT"
+sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv exec pip install --upgrade requests pyserial pyudev
+chown -R www-data:www-data "$PYENV_ROOT"
+sudo -E -u www-data "$PYENV_ROOT"/bin/pyenv exec pip install aiohttp
+chown -R www-data:www-data "$PYENV_ROOT"
+echo 100 > "$PROGRESS_FILE"
+rm "$PROGRESS_FILE"
+rm "$TMP_FILE"
+echo "********************************************************"
+echo "*       Installation terminée          *"
+echo "********************************************************"
+date
