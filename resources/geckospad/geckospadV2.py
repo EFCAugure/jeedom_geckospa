@@ -35,6 +35,7 @@ class GeckoSpaMan(GeckoAsyncSpaMan):
 	async def handle_event(self, event: GeckoSpaEvent, **kwargs) -> None:
 		# Uncomment this line to see events generated
 		# print(f"{event}: {kwargs}")
+		_LOGGER.info("received event : " + event + " | args : " + kwargs)
 		pass
 
 class GeckoSpa:	
