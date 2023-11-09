@@ -33,6 +33,7 @@ class geckospa extends eqLogic {
         if (file_exists(jeedom::getTmpFolder(__CLASS__) . '/dependency')) {
             $return['state'] = 'in_progress';
         } else {
+            /*
             if (exec(system::getCmdSudo() . system::get('cmd_check') . '-Ec "python3\-dev|python3.9\-venv"') < 2) {
                 $return['state'] = 'nok';
             } elseif (exec(system::getCmdSudo() . self::PYTHON_PATH . ' -m pip list | grep -Ewc "wheel|aiohttp"') < 2) {
@@ -40,6 +41,8 @@ class geckospa extends eqLogic {
             } else {
                 $return['state'] = 'ok';
             }
+            */
+            $return['state'] = 'ok';
         }
         return $return;
     }
@@ -93,16 +96,16 @@ public static function deamon_start() {
   log::add(__CLASS__, 'info', 'Lancement démon');
   $result = exec($cmd . ' >> ' . log::getPathToLog('geckospa_daemon') . ' 2>&1 &'); 
   */
-  
+
   $request = ' --loglevel ' . log::convertLogLevel(log::getLogLevel(__CLASS__));
   $request .= ' --socketport ' . config::byKey('socketport', __CLASS__, '55009'); // port du daemon
   $request .= ' --callback ' . network::getNetworkAccess('internal', 'proto:127.0.0.1:port:comp') . '/plugins/geckospa/core/php/jeeGeckospa.php'; // chemin de la callback url 
   $request .= ' --apikey ' . jeedom::getApiKey(__CLASS__); // l'apikey pour authentifier les échanges suivants
-  $request .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/geckospad.pid'; // et on précise le chemin vers le pid file (ne pas modifier)
+  $request .= ' --pid ' . jeedom::getTmpFolder(__CLASS__) . '/geckospadV2.pid'; // et on précise le chemin vers le pid file (ne pas modifier)
   $request .= ' --clientId "' . trim(str_replace('"', '\"', self::guidv4())) . '"'; // IP box somfy
 
-  $geckospa_path = realpath(dirname(__FILE__) . '/../../ressources/geckospad/geckospadV2.py');
-  $pyenv_path = realpath(dirname(__FILE__) . '/../../ressources/_pyenv');
+  $geckospa_path = realpath(dirname(__FILE__) . '/../../resources/geckospad/geckospadV2.py');
+  $pyenv_path = realpath(dirname(__FILE__) . '/../../resources/_pyenv');
   $cmd = 'export PYENV_ROOT="' . $pyenv_path . '"; command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"; eval "$(pyenv init -)"; ';
   $cmd .= 'cd ' . $geckospa_path . '; ';
   $cmd .= 'nice -n 19 python3 geckospadV2.py' . $request;
