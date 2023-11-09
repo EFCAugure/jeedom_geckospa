@@ -57,8 +57,9 @@ class GeckoSpa:
 			return
 
 		self._loop = asyncio.get_running_loop()
-		#_LOGGER.info('   before GeckoSpaMan -> '+ self._config.clientId)
+		_LOGGER.info('   before _connectingToSpas -> ')
 		self._connectingToSpas()
+		_LOGGER.info('   after _connectingToSpas -> ')
 			'''
 			_LOGGER.info("ChD => waterheater")
 			_LOGGER.info(spaman.facade.water_heater)
@@ -84,7 +85,9 @@ class GeckoSpa:
 			await asyncio.gather(self._auto_reconnect_task, self._listen_task, self._send_task)
 
 	async def _auto_reconnect(self):
+		_LOGGER.info('   before _auto_reconnect -> ')
 		self._connectingToSpas()
+		_LOGGER.info('   after _auto_reconnect -> ')
 
 	async def _connectingToSpas(self):
 			async with GeckoSpaMan(self._config.clientId, spa_address=SPA_ADDRESS) as spaman:
