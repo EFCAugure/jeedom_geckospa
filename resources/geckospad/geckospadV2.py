@@ -177,5 +177,5 @@ except Exception as e:
 	filename = exception_traceback.tb_frame.f_code.co_filename
 	line_number = exception_traceback.tb_lineno
 	_LOGGER.error('Fatal error: %s(%s) in %s on line %s', e, exception_type, filename, line_number)
-_LOGGER.info("before end shutdown")
-shutdown()
+	_LOGGER.info("Exception before end shutdown")
+	shutdown()
