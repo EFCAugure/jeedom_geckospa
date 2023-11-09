@@ -60,29 +60,13 @@ class GeckoSpa:
 		_LOGGER.info('   before _connectingToSpas -> ')
 		self._connectingToSpas()
 		_LOGGER.info('   after _connectingToSpas -> ')
-			'''
-			_LOGGER.info("ChD => waterheater")
-			_LOGGER.info(spaman.facade.water_heater)
+		self._listen_task = Listener.create_listen_task(self._config.socket_host, self._config.socket_port, self._on_socket_message)
+		self._auto_reconnect_task = asyncio.create_task(self._auto_reconnect())
 
-			_LOGGER.info("ChD => Turning pump 1 on")
-			#await spaman.facade.pumps[0].async_set_mode("HI")
-
-			#await asyncio.sleep(5)
-
-			_LOGGER.info("ChD => Turning pump 1 off")
-			#await spaman.facade.pumps[0].async_set_mode("OFF")
-
-			_LOGGER.info("ChD => before asyncio.sleep(5)")
-			await asyncio.sleep(5)
-			_LOGGER.info("ChD => after asyncio.sleep(5)")
-			'''
-			self._listen_task = Listener.create_listen_task(self._config.socket_host, self._config.socket_port, self._on_socket_message)
-			self._auto_reconnect_task = asyncio.create_task(self._auto_reconnect())
-
-			await self.add_signal_handler()
-			await asyncio.sleep(1) # allow  all tasks to start
-			_LOGGER.info("Ready")
-			await asyncio.gather(self._auto_reconnect_task, self._listen_task, self._send_task)
+		await self.add_signal_handler()
+		await asyncio.sleep(1) # allow  all tasks to start
+		_LOGGER.info("Ready")
+		await asyncio.gather(self._auto_reconnect_task, self._listen_task, self._send_task)
 
 	async def _auto_reconnect(self):
 		_LOGGER.info('   before _auto_reconnect -> ')
