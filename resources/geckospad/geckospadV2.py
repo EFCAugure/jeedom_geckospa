@@ -78,6 +78,7 @@ class GeckoSpa:
 			# Wait for the facade to be ready
 			await spaman.wait_for_facade()
 
+			_LOGGER.info("ChD => waterheater")
 			_LOGGER.info("ChD => " + spaman.facade.water_heater)
 
 			_LOGGER.info("ChD => Turning pump 1 on")
