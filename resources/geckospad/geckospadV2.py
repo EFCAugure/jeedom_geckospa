@@ -79,7 +79,7 @@ class GeckoSpa:
 			await spaman.wait_for_facade()
 
 			_LOGGER.info("ChD => waterheater")
-			_LOGGER.info("ChD => " + spaman.facade.water_heater)
+			_LOGGER.info(spaman.facade.water_heater)
 
 			_LOGGER.info("ChD => Turning pump 1 on")
 			#await spaman.facade.pumps[0].async_set_mode("HI")
