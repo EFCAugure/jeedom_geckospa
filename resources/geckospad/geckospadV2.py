@@ -78,17 +78,19 @@ class GeckoSpa:
 			# Wait for the facade to be ready
 			await spaman.wait_for_facade()
 
-			_LOGGER.info(spaman.facade.water_heater)
+			_LOGGER.info("ChD => " + spaman.facade.water_heater)
 
-			_LOGGER.info("Turning pump 1 on")
+			_LOGGER.info("ChD => Turning pump 1 on")
 			#await spaman.facade.pumps[0].async_set_mode("HI")
 
 			#await asyncio.sleep(5)
 
-			_LOGGER.info("Turning pump 1 off")
+			_LOGGER.info("ChD => Turning pump 1 off")
 			#await spaman.facade.pumps[0].async_set_mode("OFF")
 
+			_LOGGER.info("ChD => before asyncio.sleep(5)")
 			await asyncio.sleep(5)
+			_LOGGER.info("ChD => after asyncio.sleep(5)")
 
 	async def add_signal_handler(self):
 		self._loop.add_signal_handler(signal.SIGINT, functools.partial(self._ask_exit, signal.SIGINT))
@@ -174,4 +176,5 @@ except Exception as e:
 	filename = exception_traceback.tb_frame.f_code.co_filename
 	line_number = exception_traceback.tb_lineno
 	_LOGGER.error('Fatal error: %s(%s) in %s on line %s', e, exception_type, filename, line_number)
+_LOGGER.info("before end shutdown")
 shutdown()
