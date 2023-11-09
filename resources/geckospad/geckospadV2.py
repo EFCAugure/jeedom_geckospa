@@ -86,7 +86,7 @@ class GeckoSpa:
 			_LOGGER.info("Turning pump 1 off")
 			#await spaman.facade.pumps[0].async_set_mode("OFF")
 
-			#await asyncio.sleep(5)
+			await asyncio.sleep(5)
 
 	async def add_signal_handler(self):
 		self._loop.add_signal_handler(signal.SIGINT, functools.partial(self._ask_exit, signal.SIGINT))
