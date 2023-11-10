@@ -49,6 +49,7 @@ class GeckoSpa:
 		self._loop = None
 		self._logger = logging.getLogger(__name__)
 		self._facade = None
+		self._spaman= None
 
 	async def main(self):
 		_LOGGER.info('   main')
@@ -57,12 +58,13 @@ class GeckoSpa:
 			return
 
 		self._loop = asyncio.get_running_loop()
+		self._send_task = self._jeedom_publisher.create_send_task()
 		_LOGGER.info('ChD   before _connectingToSpas -> ')
 		await self._connectingToSpas()
 		_LOGGER.info('ChD    after _connectingToSpas -> ')
 		self._listen_task = Listener.create_listen_task(self._config.socket_host, self._config.socket_port, self._on_socket_message)
 		_LOGGER.info('ChD    _auto_reconnect_task')        
-		#self._auto_reconnect_task = asyncio.create_task(self._auto_reconnect())
+		self._auto_reconnect_task = asyncio.create_task(self._auto_reconnect())
 
 		_LOGGER.info('ChD    add_signal_handler') 
 		await self.add_signal_handler()
@@ -76,13 +78,12 @@ class GeckoSpa:
 	async def _auto_reconnect(self):
 		_LOGGER.info('   ChD before _auto_reconnect -> ')
 		try:
-			if self._facade is not None:
-				while not self._facade.is_connected:
-					_LOGGER.info('   ChD facade not connected ')
-					await self._connectingToSpas()
+			if self._spaman is not None:
+				_LOGGER.info('   ChD auto reconnect wait for facade')
+				await self._spaman.wait_for_facade()
 			else:
-				_LOGGER.info('   ChD facade connected ')
-				#await self._connectingToSpas()
+				_LOGGER.info('   ChD spaman not exist -> connecting ')
+				await self._connectingToSpas()
 		except asyncio.CancelledError:
 			_LOGGER.info('   ChD  error auto_reconnect task ')          		
 
@@ -105,12 +106,13 @@ class GeckoSpa:
 					spa_descriptor.name,
 				)
 
+				self._spaman=spaman
 				# Wait for the facade to be ready
 				await spaman.wait_for_facade()
 				_LOGGER.info("ChD spa connected")
 				self._facade=spaman.facade
 				_LOGGER.info("ChD after saved facade")
-				await asyncio.sleep(5)
+				await asyncio.sleep(2)
 				_LOGGER.info(spaman.facade.water_heater)
 
 	async def add_signal_handler(self):
@@ -139,7 +141,7 @@ class GeckoSpa:
 			if message['action'] == 'stop':
 				self.close()
 			elif message['action'] == 'synchronize':
-				_LOGGER.info('ChD  _on_socket_message -> synchronize')	
+				_LOGGER.info('ChD  _on_socket_message -> synchronize')
 				#self._worxcloud.fetch()
 				#await self._send_devices()
 			elif message['action'] == 'get_activity_logs':
@@ -148,6 +150,10 @@ class GeckoSpa:
 				_LOGGER.info('ChD  _on_socket_message -> _on_socket_message')				
 			else:
 				_LOGGER.info('ChD  else _on_socket_message')
+				_LOGGER.info("ChD _on_socket_message spa connected")
+				self._spaman.facade
+				_LOGGER.info("ChD _on_socket_message get facade")
+				_LOGGER.info(self._spaman.facade.water_heater)                
 				#await self._executeAction(message)
 		except Exception as e:
 			_LOGGER.error('ChD Send command to daemon error: %s', e)
