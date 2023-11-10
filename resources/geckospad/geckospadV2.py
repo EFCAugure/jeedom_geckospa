@@ -49,6 +49,7 @@ class GeckoSpa:
 		self._loop = None
 		self._logger = logging.getLogger(__name__)
 		self._facade = None
+		self.spaman = None
 
 	async def main(self):
 		_LOGGER.info('   main')
@@ -69,8 +70,11 @@ class GeckoSpa:
 		await asyncio.gather(self._auto_reconnect_task, self._listen_task, self._send_task)
 
 	async def _auto_reconnect(self):
-		_LOGGER.info('   before _auto_reconnect -> ')
-		self._connectingToSpas()
+		_LOGGER.info('	-> _auto_reconnect')
+		while not self._facade.is_connected:
+			_LOGGER.info('   	- facade not connected')
+		
+		#self._connectingToSpas()
 		_LOGGER.info('   after _auto_reconnect -> ')
 
 	async def _connectingToSpas(self):
@@ -94,6 +98,7 @@ class GeckoSpa:
 
 				# Wait for the facade to be ready
 				await spaman.wait_for_facade()
+				self.spaman = spaman
 				self._facade=spaman.facade
 
 	async def add_signal_handler(self):
