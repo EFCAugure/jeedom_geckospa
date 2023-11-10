@@ -108,7 +108,7 @@ class GeckoSpa:
 				# Wait for the facade to be ready
 				await spaman.wait_for_facade()
 				_LOGGER.info("ChD spa connected")
-				await self._facade=spaman.facade
+				self._facade=spaman.facade
 				_LOGGER.info("ChD after saved facade")
 				await asyncio.sleep(5)
 				_LOGGER.info(spaman.facade.water_heater)
