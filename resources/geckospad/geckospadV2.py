@@ -107,7 +107,9 @@ class GeckoSpa:
 
 				# Wait for the facade to be ready
 				await spaman.wait_for_facade()
+				_LOGGER.info("ChD spa connected")
 				self._facade=spaman.facade
+				_LOGGER.info("ChD after saved facade")
 
 	async def add_signal_handler(self):
 		self._loop.add_signal_handler(signal.SIGINT, functools.partial(self._ask_exit, signal.SIGINT))
