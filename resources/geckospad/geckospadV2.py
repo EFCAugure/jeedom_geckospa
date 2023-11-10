@@ -68,10 +68,10 @@ class GeckoSpa:
 		await self.add_signal_handler()
 		_LOGGER.info('ChD    asyncio.sleep(1)')         
 		await asyncio.sleep(1) # allow  all tasks to start
-		_LOGGER.info("Ready")
-		#_LOGGER.info('ChD    asyncio.gather')        
-		#await asyncio.gather(self._auto_reconnect_task, self._listen_task, self._send_task)
-		#_LOGGER.info('ChD    after asyncio.gather')
+		_LOGGER.info("ChD Ready")
+		_LOGGER.info('ChD    asyncio.gather')        
+		await asyncio.gather(self._auto_reconnect_task, self._listen_task, self._send_task)
+		_LOGGER.info('ChD    after asyncio.gather')
 
 	async def _auto_reconnect(self):
 		_LOGGER.info('   ChD before _auto_reconnect -> ')
