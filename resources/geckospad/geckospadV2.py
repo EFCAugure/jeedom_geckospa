@@ -88,17 +88,17 @@ class GeckoSpa:
 
 	async def _connectingToSpas(self):
 			async with GeckoSpaMan(self._config.clientId, spa_address=SPA_ADDRESS) as spaman:
-				_LOGGER.info("Looking for spas on your network ...")
+				_LOGGER.info("ChD Looking for spas on your network ...")
 
 				# Wait for descriptors to be available
 				await spaman.wait_for_descriptors()
 
 				if len(spaman.spa_descriptors) == 0:
-					_LOGGER.info("**** There were no spas found on your network.")
+					_LOGGER.info("ChD **** There were no spas found on your network.")
 					return
 
 				spa_descriptor = spaman.spa_descriptors[0]
-				_LOGGER.info("Connecting to " + spa_descriptor.name +" at " + spa_descriptor.ipaddress +" ...")
+				_LOGGER.info("ChD Connecting to " + spa_descriptor.name +" at " + spa_descriptor.ipaddress +" ...")
 				await spaman.async_set_spa_info(
 					spa_descriptor.ipaddress,
 					spa_descriptor.identifier_as_string,
@@ -114,7 +114,7 @@ class GeckoSpa:
 		self._loop.add_signal_handler(signal.SIGTERM, functools.partial(self._ask_exit, signal.SIGTERM))
 
 	def _ask_exit(self, sig):
-		self._logger.info("Signal %i caught, exiting...", sig)
+		self._logger.info("ChD Signal %i caught, exiting...", sig)
 		self.close()
 
 	def close(self):
@@ -124,38 +124,38 @@ class GeckoSpa:
 
 	def _on_message(self, name):
 		#tmpDevice = self._get_device_to_send(device)
-		_LOGGER.debug("_on_message")
+		_LOGGER.debug("ChD _on_message")
 		#self._loop.create_task(self.__format_and_send('update::' + device.uuid, tmpDevice))
 
 	async def _on_socket_message(self, message):
 		if message['apikey'] != self._config.api_key:
-			_LOGGER.error('Invalid apikey from socket : %s', str(message))
+			_LOGGER.error('ChD Invalid apikey from socket : %s', str(message))
 			return
 		try:
 			if message['action'] == 'stop':
 				self.close()
 			elif message['action'] == 'synchronize':
-				_LOGGER.info('_on_socket_message -> synchronize')	
+				_LOGGER.info('ChD  _on_socket_message -> synchronize')	
 				#self._worxcloud.fetch()
 				#await self._send_devices()
 			elif message['action'] == 'get_activity_logs':
 				#device = self._worxcloud.get_device_by_serial_number(message['serial_number'])
 				#await self.__format_and_send('activity_logs::' + device.uuid, payload)
-				_LOGGER.info('_on_socket_message -> _on_socket_message')				
+				_LOGGER.info('ChD  _on_socket_message -> _on_socket_message')				
 			else:
-				_LOGGER.info('else _on_socket_message')
+				_LOGGER.info('ChD  else _on_socket_message')
 				#await self._executeAction(message)
 		except Exception as e:
-			_LOGGER.error('Send command to daemon error: %s', e)
+			_LOGGER.error('ChD Send command to daemon error: %s', e)
 
 	async def __format_and_send(self, key, data):
 		payload = json.loads(json.dumps(data, default=lambda d: self.__encoder(d)))
 		await self._jeedom_publisher.add_change(key, payload)
 
 def shutdown():
-	_LOGGER.info("Shuting down")
+	_LOGGER.info("ChD Shuting down")
 	try:
-		_LOGGER.debug("Removing PID file %s", config.pid_filename)
+		_LOGGER.debug("ChD Removing PID file %s", config.pid_filename)
 		os.remove(config.pid_filename)
 	except:
 		pass
@@ -192,5 +192,5 @@ except Exception as e:
 	exception_type, exception_object, exception_traceback = sys.exc_info()
 	filename = exception_traceback.tb_frame.f_code.co_filename
 	line_number = exception_traceback.tb_lineno
-	_LOGGER.error('Fatal error: %s(%s) in %s on line %s', e, exception_type, filename, line_number)
+	_LOGGER.error('ChD Fatal error: %s(%s) in %s on line %s', e, exception_type, filename, line_number)
 shutdown()
