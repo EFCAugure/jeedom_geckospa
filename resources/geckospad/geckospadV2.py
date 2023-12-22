@@ -50,6 +50,7 @@ class GeckoSpa:
 		self._logger = logging.getLogger(__name__)
 		self._facade = None
 		self._spaman= None
+		self._device_info = None
 
 	async def main(self):
 		_LOGGER.info('   main')
@@ -97,7 +98,7 @@ class GeckoSpa:
 				if len(spaman.spa_descriptors) == 0:
 					_LOGGER.info("ChD **** There were no spas found on your network.")
 					return
-
+				'''
 				spa_descriptor = spaman.spa_descriptors[0]
 				_LOGGER.info("ChD Connecting to " + spa_descriptor.name +" at " + spa_descriptor.ipaddress +" ...")
 				await spaman.async_set_spa_info(
@@ -105,15 +106,113 @@ class GeckoSpa:
 					spa_descriptor.identifier_as_string,
 					spa_descriptor.name,
 				)
+				'''
 
 				self._spaman=spaman
+				await self.getDevices()
+
 				# Wait for the facade to be ready
-				await spaman.wait_for_facade()
+				#await spaman.wait_for_facade()
 				_LOGGER.info("ChD spa connected")
 				self._facade=spaman.facade
 				_LOGGER.info("ChD after saved facade")
+				#await self.getDevices()
 				await asyncio.sleep(2)
 				_LOGGER.info(spaman.facade.water_heater)
+				#_LOGGER.info(self._spaman.facade.water_heater)
+				#_LOGGER.info(self._facade.water_heater)
+
+	async def getDevices(self):
+		_LOGGER.info("ChD getDevices")
+		response={}
+		response['spas']=[]
+		for i in range(len(self._spaman.spa_descriptors)):
+			spa_descriptor = self._spaman.spa_descriptors[i]
+			spa={}
+			spa['name']=spa_descriptor.name
+			spa['id']=spa_descriptor.identifier_as_string
+
+			_LOGGER.info("ChD Connecting to " + spa_descriptor.name +" at " + spa_descriptor.ipaddress +" ...")
+			await self._spaman.async_set_spa_info(
+					spa_descriptor.ipaddress,
+					spa_descriptor.identifier_as_string,
+					spa_descriptor.name,
+			)
+			await self._spaman.wait_for_facade()
+			self._facade=self._spaman.facade
+
+			await self.state()
+			if self._device_info is not None:
+				spa['cmds'] = self._device_info
+			response['spas'].append(spa)
+		
+		_LOGGER.debug("ChD get devices info : %s", json.dumps(response))
+		await self.__format_and_send('devicesList', response)
+	
+	async def state(self):
+		cmds=[]
+
+		cmdWaterCare={}
+		cmdWaterCare['name'] = 'waterCare'
+		cmdWaterCare['state'] = str(self._facade.water_care.mode)
+		cmdWaterCare['stateString'] = str(self._facade.water_care.monitor)
+		cmdWaterCare['stateList'] = str(self._facade.water_care.modes)
+		cmds.append(cmdWaterCare)
+    
+
+		for i in range(len(self._facade.lights)):
+			cmdLights = {}
+			cmdLights['name'] = "lights_" + str(i)
+			cmdLights['state'] = str(self._facade.lights[i].is_on)
+			cmdLights['stateList'] = ['ON', 'OFF']
+			cmds.append(cmdLights)
+		
+		cmdHeater={}
+		cmdHeater['name'] = 'waterHeater'
+		cmdHeater['min_temp'] = str(self._facade.water_heater.min_temp)
+		cmdHeater['max_temp'] = str(self._facade.water_heater.max_temp)
+		cmdHeater['current_temp'] = str(self._facade.water_heater.current_temperature)
+		cmdHeater['current_operation'] = str(self._facade.water_heater.current_operation)
+		cmdHeater['target_temperature'] = str(self._facade.water_heater.target_temperature)
+		cmdHeater['unit'] = str(self._facade.water_heater.temperature_unit)
+		cmds.append(cmdHeater)
+    
+		for i in range(len(self._facade.pumps)):
+			cmdPumps={}
+			cmdPumps['name'] = "pumps_" + str(i)
+			cmdPumps['state'] = str(self._facade.pumps[i].is_on)
+			cmdPumps['mode'] = str(self._facade.pumps[i].mode)
+			cmdPumps['stateList'] = str(self._facade.pumps[i].modes)
+			cmds.append(cmdPumps)
+
+		for i in range(len(self._facade.blowers)):
+			cmdBlowers = {}
+			cmdBlowers['name'] = "blower_" + str(i)
+			cmdBlowers['state'] = str(self._facade.blowers[i].is_on)
+			cmds.append(cmdBlowers)
+
+		for i in range(len(self._facade.sensors)):
+			cmdSensors = {}
+			cmdSensors['name'] = "sensor_" + str(i)
+			cmdSensors['label'] = str(self._facade.sensors[i].accessor.tag)     
+			cmdSensors['state'] = str(self._facade.sensors[i].state)
+			cmdSensors['unit'] = str(self._facade.sensors[i].unit_of_measurement)
+			cmds.append(cmdSensors)
+
+		del cmdSensors
+
+		for i in range(len(self._facade.binary_sensors)):
+			cmdSensors = {}
+			cmdSensors['name'] = "sensorBinary_" + str(i)
+			cmdSensors['label'] = str(self._facade.binary_sensors[i].accessor.tag)
+			cmdSensors['state'] = str(self._facade.binary_sensors[i].state)
+			cmdSensors['unit'] = str(self._facade.binary_sensors[i].unit_of_measurement)
+			cmds.append(cmdSensors)        
+
+			del cmdSensors
+
+
+		self._device_info = cmds
 
 	async def add_signal_handler(self):
 		self._loop.add_signal_handler(signal.SIGINT, functools.partial(self._ask_exit, signal.SIGINT))
@@ -140,27 +239,99 @@ class GeckoSpa:
 		try:
 			if message['action'] == 'stop':
 				self.close()
-			elif message['action'] == 'synchronize':
-				_LOGGER.info('ChD  _on_socket_message -> synchronize')
-				#self._worxcloud.fetch()
-				#await self._send_devices()
+			elif message['action'] == 'synchronizeBySpaId':
+				_LOGGER.info('ChD  _on_socket_message -> synchronizeBySpaId')
+				for i in range(len(self._spaman.spa_descriptors)):
+					spa_descriptor = self._spaman.spa_descriptors[i]
+					if (message['spaId'] == spa_descriptor.identifier_as_string):
+						_LOGGER.debug(' * ChD spa found')
+						response={}
+						response['spas']=[]
+						spa={}
+						spa['name']=spa_descriptor.name
+						spa['id']=spa_descriptor.identifier_as_string
+						await self.state()
+						if self._device_info is not None:
+							spa['cmds'] = self._device_info
+							response['spas'].append(spa)
+							await self.__format_and_send('devicesList', response)
+						
 			elif message['action'] == 'get_activity_logs':
 				#device = self._worxcloud.get_device_by_serial_number(message['serial_number'])
 				#await self.__format_and_send('activity_logs::' + device.uuid, payload)
-				_LOGGER.info('ChD  _on_socket_message -> _on_socket_message')				
+				_LOGGER.info('ChD  _on_socket_message -> _on_socket_message')
+			elif message['action'] == 'execCmd':
+				_LOGGER.info('ChD  execCmd -> ' + json.dumps(message))
+				await self._execCmd(message)
 			else:
 				_LOGGER.info('ChD  else _on_socket_message')
-				_LOGGER.info("ChD _on_socket_message spa connected")
-				self._spaman.facade
-				_LOGGER.info("ChD _on_socket_message get facade")
-				_LOGGER.info(self._spaman.facade.water_heater)                
-				#await self._executeAction(message)
 		except Exception as e:
 			_LOGGER.error('ChD Send command to daemon error: %s', e)
 
 	async def __format_and_send(self, key, data):
 		payload = json.loads(json.dumps(data, default=lambda d: self.__encoder(d)))
 		await self._jeedom_publisher.add_change(key, payload)
+
+	async def _execCmd(self,params):	
+		_LOGGER.debug(' * Execute command')
+
+		if params['spaIdentifier'] != "":
+			spaResp={}
+			spaResp['name']=""
+			spaResp['id']=params['spaIdentifier']
+
+		for i in range(len(self._spaman.spa_descriptors)):
+			spa_descriptor = self._spaman.spa_descriptors[i]
+			if (params['spaIdentifier'] == spa_descriptor.identifier_as_string):
+				_LOGGER.debug(' * ChD spa found')
+				spa={}
+				spa['name']=spa_descriptor.name
+				spa['id']=spa_descriptor.identifier_as_string
+
+				'''
+				_LOGGER.info("ChD _execCmd Connecting to " + spa_descriptor.name +" at " + spa_descriptor.ipaddress +" ...")
+				await self._spaman.async_set_spa_info(
+						spa_descriptor.ipaddress,
+						spa_descriptor.identifier_as_string,
+						spa_descriptor.name,
+				)
+
+				'''
+				#await self._spaman.wait_for_facade()
+
+				_LOGGER.info("ChD _execCmd before params check")
+				if params['action'] != "":						
+					if params['cmd'] != "":
+						_LOGGER.debug('   - action : ' + params['action'])
+						_LOGGER.debug('   - cmd : ' + params['cmd'])
+						if params['cmd'] == "lights":
+							_LOGGER.debug('   - value : ' + params['value'])																											
+							if params['value'] == 'ON':
+								await self._spaman.facade.lights[int(params['ind'])].async_turn_on()
+								#await asyncio.sleep(5)
+							else:
+								await self._spaman.facade.lights[int(params['ind'])].async_turn_off()								
+								#await asyncio.sleep(5)
+
+						if params['cmd'] == "pumps":
+							_LOGGER.debug('   - value : ' + params['value'])
+							await self._spaman.facade.pumps[int(params['ind'])].async_set_mode(params['value'])  
+							#await asyncio.sleep(5)
+						'''
+						if params['cmd'] == "waterCare":
+							facade.water_care.set_mode(params['value'])
+							time.sleep(15)
+						if params['cmd'] == "target_temperature":
+							facade.water_heater.set_target_temperature(params['value'])
+
+						time.sleep(5)						
+						spaResp['cmds']=getStateFromFacade(facade)
+						logging.debug("Update items : %s", json.dumps(spaResp))
+						jeedom_com.send_change_immediate({'updateItems' : json.dumps(spaResp)})
+						'''
+				
+				_LOGGER.info("ChD _execCmd end params check")
+				#await self.getDevices()
 
 def shutdown():
 	_LOGGER.info("ChD Shuting down")

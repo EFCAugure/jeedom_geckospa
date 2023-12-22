@@ -274,7 +274,11 @@ public static function sendToDaemon($params) {
                     if ($cmd['state'] != '') {
                         if(is_bool($cmd['state'])) {
                             $geckoSpaCmd->event((boolean) $cmd['state']);
-                        } else {
+                        } elseif ($cmd['state'] == 'True') {
+                            $geckoSpaCmd->event((boolean) 1);
+                        } elseif ($cmd['state'] == 'False') {
+                            $geckoSpaCmd->event((boolean) 0);
+                        }else {
                             $geckoSpaCmd->event($cmd['state']);
                         }
                     } else {
